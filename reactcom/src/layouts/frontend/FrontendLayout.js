@@ -1,6 +1,7 @@
 import React from "react";
 import { Switch, Route } from "react-router-dom";
 import Navbar from "../../layouts/frontend/Navbar";
+import Footer from "../../layouts/frontend/Footer";
 import PublicRoutelist from "../../routes/PublicRoutelist";
 
 const FrontendLayout = () => {
@@ -24,6 +25,7 @@ const FrontendLayout = () => {
           })}
         </Switch>
       </div>
+      <Footer />
     </div>
   );
 };

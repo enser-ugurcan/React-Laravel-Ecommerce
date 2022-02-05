@@ -93,9 +93,7 @@ function Cart() {
                     />
                   </td>
                   <td>
-                    <Link
-                      to={`/collections/${item.product.name}/${item.product.slug}}`}
-                    >
+                    <Link to={`/collections/${item.product.slug}/${item.name}`}>
                       {item.product.name}
                     </Link>
                   </td>
@@ -131,7 +129,7 @@ function Cart() {
     <div>
       <div className="py-3 bg-warning">
         <div className="container">
-          <h6>Home / Cart</h6>
+          <h6>Home / Wishlist</h6>
         </div>
       </div>
       <div className="py-4">

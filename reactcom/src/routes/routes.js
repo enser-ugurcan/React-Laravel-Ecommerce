@@ -8,6 +8,7 @@ import ViewProduct from "../components/admin/product/ViewProduct";
 import EditProduct from "../components/admin/product/EditProduct";
 import Order from "../components/admin/order/Order";
 import User from "../components/admin/user/User";
+import Contact from "../components/admin/contact/Contact";
 
 const routes = [
   { path: "/admin", exact: true, name: "Admin" },
@@ -56,5 +57,6 @@ const routes = [
   { path: "/admin/profile", exact: true, name: "Profile", component: Profile },
   { path: "/admin/orders", exact: true, name: "order", component: Order },
   { path: "/admin/users", exact: true, name: "user", component: User },
+  { path: "/admin/contact", exact: true, name: "contact", component: Contact },
 ];
 export default routes;

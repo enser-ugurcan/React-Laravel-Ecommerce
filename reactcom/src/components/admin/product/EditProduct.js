@@ -17,6 +17,8 @@ function EditProduct(props) {
     meta_title: "",
     meta_keyword: "",
     meta_descrip: "",
+    color: "",
+    size: "",
 
     selling_price: "",
     original_price: "",
@@ -76,6 +78,8 @@ function EditProduct(props) {
     formData.append("meta_keyword", productInput.meta_keyword);
     formData.append("meta_descrip", productInput.meta_descrip);
 
+    formData.append("color", productInput.color);
+    formData.append("size", productInput.size);
     formData.append("selling_price", productInput.selling_price);
     formData.append("original_price", productInput.original_price);
     formData.append("qty", productInput.qty);
@@ -310,6 +314,28 @@ function EditProduct(props) {
                       className="form-control"
                     />
                     <small className="text-danger">{errorlist.qty}</small>
+                  </div>
+                  <div className="col-md-4 form-group mb-3">
+                    <label>Color</label>
+                    <input
+                      type="text"
+                      name="color"
+                      onChange={handleInput}
+                      value={productInput.color}
+                      className="form-control"
+                    />
+                    <small className="text-danger">{errorlist.color}</small>
+                  </div>
+                  <div className="col-md-4 form-group mb-3">
+                    <label>Size</label>
+                    <input
+                      type="text"
+                      name="size"
+                      onChange={handleInput}
+                      value={productInput.size}
+                      className="form-control"
+                    />
+                    <small className="text-danger">{errorlist.size}</small>
                   </div>
                   <div className="col-md-4 form-group mb-3">
                     <label>Brand</label>

@@ -15,6 +15,8 @@ use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\FrontUserController;
 use App\Http\Controllers\API\ForgotController;
+use App\Http\Controllers\API\ContactController;
+
 
 
 Route::post('register',[AuthController::class,'register']);
@@ -62,6 +64,10 @@ Route::middleware(['auth:sanctum', 'isAPIAdmin'])->group(function(){
     Route::get('admin/orders',[OrderController::class,'index']);
     //Users
     Route::get('admin/users',[UserController::class,'index']);
+    //Contacs
+    Route::get('admin/contact',[ContactController::class,'index']);
+
+    
     //Product
     Route::post('store-product',[ProductController::class,'store']);
     Route::get('view-product',[ProductController::class,'index']);

@@ -78,12 +78,14 @@ class CartController extends Controller
                 }           
             }
            
-        } 
-        $cartcount = Cart::where('user_id',Auth::id())->count();
-        return response()->json([
-            'status'=>200,
-            'count'=>$cartcount
-        ]);
+        }  
+             $user_id = auth('sanctum')->user()->id;
+             $cartitems = Cart::where('user_id', $user_id)->get()->count();
+             return response()->json([
+                'status'=>200,
+                'count'=>$cartitems
+            ]); 
+
     }
     public function viewcart()
     {
@@ -189,6 +191,12 @@ class CartController extends Controller
                 ]); 
             }
         }
+        $user_id = auth('sanctum')->user()->id;
+        $cartitems = Cart::where('user_id', $user_id)->get()->count();
+        return response()->json([
+           'status'=>200,
+           'count'=>$cartitems
+       ]); 
 
     }
 }

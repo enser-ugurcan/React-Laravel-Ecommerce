@@ -73,6 +73,12 @@ const Sidebar = () => {
               </div>
               Users
             </Link>
+            <Link className="nav-link" to="/admin/contact">
+              <div className="sb-nav-link-icon">
+                <i className="fas fa-tachometer-alt"></i>
+              </div>
+              Contacts
+            </Link>
           </div>
         </div>
       </nav>

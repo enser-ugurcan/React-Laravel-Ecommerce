@@ -7,6 +7,7 @@ import { Spinner, Button } from "react-bootstrap";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import swal from "sweetalert";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import "./style.css";
 
 function ViewProduct(props) {
@@ -14,7 +15,6 @@ function ViewProduct(props) {
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
   const [category, setCategory] = useState([]);
-  const [quantity, setQuantity] = useState(1);
 
   const productCount = product.length;
 
@@ -40,25 +40,6 @@ function ViewProduct(props) {
       isMountered = false;
     };
   }, [props.match.params.slug, history]);
-
-  const submitAddtoWishlist = (e) => {
-    e.preventDefault();
-    const data = {
-      product_id: product.id,
-      product_qty: quantity,
-    };
-    axios.post(`api/add-to-wishlist`, data).then((res) => {
-      if (res.data.status === 201) {
-        swal("Success", res.data.message, "success");
-      } else if (res.data.status === 409) {
-        swal("Warning", res.data.message, "warning");
-      } else if (res.data.status === 401) {
-        swal("Error", res.data.message, "error");
-      } else if (res.data.status === 404) {
-        swal("Warning", res.data.message, "warning");
-      }
-    });
-  };
   if (loading) {
     return (
       <h4>
@@ -81,7 +62,7 @@ function ViewProduct(props) {
         return (
           <div className="col-md-4" key={idx}>
             <div className="card">
-              <div className="card h-100 shadow-sm">
+              <div className="card h-200 shadow-sm">
                 <Link to={`/collections/${item.category.slug}/${item.name}`}>
                   <img
                     src={`http://localhost:8000/${item.image}`}
@@ -97,32 +78,8 @@ function ViewProduct(props) {
                     Kargo Bedava
                   </Link>
                 </div>
-                <div className="top-right">
-                  <button
-                    onClick={submitAddtoWishlist}
-                    type="button"
-                    className="btn btn-sm btn-outline-warning rounded-circle"
-                    title="Add to wishlist"
-                  >
-                    <svg
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fas"
-                      data-icon="heart"
-                      className="svg-inline--fa fa-heart fa-w-16 "
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 512 512"
-                    >
-                      <path
-                        fill="currentColor"
-                        d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z"
-                      ></path>
-                    </svg>
-                  </button>
-                </div>
                 <div className="card-body">
-                  <div className="clearfix mb-3">
+                  <div className="clearfix mb-5 mt-3">
                     <h5 className="card-title">
                       <Link
                         to={`/collections/${item.category.slug}/${item.name}`}
@@ -137,7 +94,11 @@ function ViewProduct(props) {
                       {item.original_price}$
                     </del>
                   </div>
-
+                  <div className="card">
+                    <div className="text">
+                      <label>10% discount on cart</label>
+                    </div>
+                  </div>
                   <div className="d-grid gap-2 my-4">
                     <Link
                       to={`/collections/${item.category.slug}/${item.name}`}
@@ -171,6 +132,21 @@ function ViewProduct(props) {
       );
     }
   }
+  var filters = "";
+  if (productCount) {
+    filters = product.map((item, idx) => {
+      return (
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">
+            {" "}
+            <Link className="text-black-50 text-decoration-none">
+              {item.brand}
+            </Link>
+          </li>
+        </ul>
+      );
+    });
+  }
   return (
     <div>
       <nav aria-label="breadcrumb">
@@ -192,11 +168,12 @@ function ViewProduct(props) {
           </li>
         </ol>
       </nav>
+
       <div className="container-fluid mb-3">
         <div className="row">
           <div className="col-md-3">
             <div className="card mb-3">
-              <div className="card-header font-weight-bold text-uppercase">
+              <div className="font-monospace fw-bold card-header font-weight-bold text-uppercase">
                 Related categories
               </div>
               <ul className="list-group list-group-flush">
@@ -207,7 +184,146 @@ function ViewProduct(props) {
                 </li>
               </ul>
             </div>
+            <div className="col-md-12 mb-4">
+              <form className="d-flex">
+                <div className="input-group">
+                  <input
+                    id="search"
+                    name="search"
+                    type="text"
+                    className="form-control"
+                    placeholder="Search"
+                    required
+                  />
+                  <button className="btn btn-outline-primary" type="submit">
+                    {" "}
+                    <FontAwesomeIcon icon={faSearch} />
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div className="card mb-3">
+              <div className="card-header fw-bold text-uppercase">Brand</div>
+              {filters}
+            </div>
+            <div className="card mb-3">
+              <div className="fw-bold card-header font-weight-bold text-uppercase">
+                FILTER PRICE
+              </div>
+              <ul className="list-group list-group-flush">
+                <li className="list-group-item">
+                  <div className="shop__sidebar__price">
+                    <ul>
+                      <li>
+                        <a href="#">$0.00 - $50.00</a>
+                      </li>
+                      <li>
+                        <a href="#">$50.00 - $100.00</a>
+                      </li>
+                      <li>
+                        <a href="#">$100.00 - $150.00</a>
+                      </li>
+                      <li>
+                        <a href="#">$150.00 - $200.00</a>
+                      </li>
+                      <li>
+                        <a href="#">$200.00 - $250.00</a>
+                      </li>
+                      <li>
+                        <a href="#">250.00+</a>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div className="card mb-3">
+              <div className="fw-bold card-header font-weight-bold text-uppercase">
+                SIZE
+              </div>
+
+              <li className="list-group-item">
+                <select name="category_id" className="form-control">
+                  <option>xxs</option>
+                  <option>xs</option>
+                  <option>s</option>
+                  <option>m</option>
+                  <option>l</option>
+                  <option>l-xl</option>
+                  <option>xl</option>
+                  <option>xxl</option>
+                  <option>2xl</option>
+                  <option>3xl</option>
+                  <option>4xl</option>
+                  <option>5xl</option>
+                  <option>6xl</option>
+                  <option>7xl</option>
+                  <option>35-cm</option>
+                  <option>40-cm</option>
+                  <option>42-cm</option>
+                  <option>44-cm</option>
+                  <option>45-cm</option>
+                  <option>48-cm</option>
+                  <option>50-cm</option>
+                  <option>0-ay</option>
+                  <option>1-ay</option>
+                  <option>2-ay</option>
+                  <option>3-ay</option>
+                  <option>1 yas</option>
+                  <option>2 yas</option>
+                  <option>3 yas</option>
+                  <option>45</option>
+                  <option>37</option>
+                  <option>38</option>
+                  <option>39</option>
+                  <option>40</option>
+                  <option>41</option>
+                  <option>42</option>
+                  <option>43</option>
+                  <option>44</option>
+                </select>
+              </li>
+            </div>
+            <div className="card mb-3">
+              <div className="font-monospace fw-bold card-header font-weight-bold text-uppercase">
+                COLORS
+              </div>
+              <ul className="list-group list-group-flush">
+                <li className="list-group-item">
+                  <div className="shop__sidebar__color">
+                    <label className="c-1" for="sp-1">
+                      <input type="radio" id="sp-1" />
+                    </label>
+                    <label className="c-2" for="sp-2">
+                      <input type="radio" id="sp-2" />
+                    </label>
+                    <label className="c-3" for="sp-3">
+                      <input type="radio" id="sp-3" />
+                    </label>
+                    <label className="c-4" for="sp-4">
+                      <input type="radio" id="sp-4" />
+                    </label>
+                    <label className="c-5" for="sp-5">
+                      <input type="radio" id="sp-5" />
+                    </label>
+                    <label className="c-6" for="sp-6">
+                      <input type="radio" id="sp-6" />
+                    </label>
+                    <label className="c-7" for="sp-7">
+                      <input type="radio" id="sp-7" />
+                    </label>
+                    <label className="c-8" for="sp-8">
+                      <input type="radio" id="sp-8" />
+                    </label>
+                    <label className="c-9" for="sp-9">
+                      <input type="radio" id="sp-9" />
+                    </label>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
+
           <div className="col-md-9">
             <div className="row">
               <div className="col-md-8">
@@ -218,7 +334,7 @@ function ViewProduct(props) {
               </div>
               <div className="col-md-4">
                 <select
-                  className="form-select w-50 float-left"
+                  className="form-select w-100 float-left"
                   aria-label="Default select"
                 >
                   <option value="1">Most Popular</option>

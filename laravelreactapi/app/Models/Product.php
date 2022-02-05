@@ -16,6 +16,8 @@ class Product extends Model
         'meta_descrip',
         'slug',
         'name',
+        'size',
+        'color',
         'small_descrip',
         'long_descrip',
         'brand',

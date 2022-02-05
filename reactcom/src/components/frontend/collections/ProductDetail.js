@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useHistory, Link } from "react-router-dom";
 import { Spinner, Button } from "react-bootstrap";
 import swal from "sweetalert";
+import img1 from "../../../images/1.jpg";
 
 function ProductDetail(props) {
   const history = useHistory();
@@ -161,7 +162,7 @@ function ProductDetail(props) {
       </nav>
 
       <div className="row">
-        <div className="col-md-8">
+        <div className="col-md-8 mx-5">
           <div className="row mb-3">
             <div className="col-md-5 text-center">
               <span className="float-start badge btn-sm btn-danger badge-pil">
@@ -175,8 +176,6 @@ function ProductDetail(props) {
             </div>
             <div className="col-md-7">
               <h1 className="h5 d-inline mr-2">{product.description}</h1>
-              <span className="badge bg-success mr-2">New</span>
-              <span className="badge bg-danger mr-2">Hot</span>
               <div className="mb-3">
                 <svg
                   width="1em"
@@ -293,12 +292,94 @@ function ProductDetail(props) {
                 <ul className="small">
                   <li>Brand : {product.brand}</li>
                   <li>Featured : {product.description}</li>
+                  <div>{product.size}</div>
+                  <div>{product.color}</div>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-        <div className="col-md-4"></div>
+        <div className="col-md-3">
+          <div class="card mb-3">
+            <div class="card-header font-weight-bold text-uppercase">
+              Featured Products
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <img
+                    src={`http://localhost:8000/${product.image}`}
+                    alt={product.name}
+                    class="img-fluid"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <h6 class="text-capitalize mb-1">{product.name}</h6>
+                  <span class="font-weight-bold h5">
+                    ${product.selling_price}
+                  </span>
+                  <del class="small text-muted mx-2">
+                    ${product.original_price}
+                  </del>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <img
+                    src={`http://localhost:8000/${product.image}`}
+                    alt={product.name}
+                    class="img-fluid"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <h6 class="text-capitalize mb-1">{product.name}</h6>
+                  <span class="font-weight-bold h5">
+                    ${product.selling_price}
+                  </span>
+                  <del class="small text-muted mx-2">
+                    ${product.original_price}
+                  </del>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <img
+                    src={`http://localhost:8000/${product.image}`}
+                    alt={product.name}
+                    class="img-fluid"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <h6 class="text-capitalize mb-1">{product.name}</h6>
+                  <span class="font-weight-bold h5">
+                    ${product.selling_price}
+                  </span>
+                  <del class="small text-muted mx-2">
+                    ${product.original_price}
+                  </del>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <img
+                    src={`http://localhost:8000/${product.image}`}
+                    alt={product.name}
+                    class="img-fluid"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <h6 class="text-capitalize mb-1">{product.name}</h6>
+                  <span class="font-weight-bold h5">
+                    ${product.selling_price}
+                  </span>
+                  <del class="small text-muted mx-2">
+                    ${product.original_price}
+                  </del>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="col-md-4 border-end"></div>
         <div className="col-md-8"></div>
       </div>

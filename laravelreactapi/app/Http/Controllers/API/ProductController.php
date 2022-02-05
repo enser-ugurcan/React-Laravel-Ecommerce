@@ -18,6 +18,8 @@ class ProductController extends Controller
             'name'=>'required|max:191',
             'meta_title'=>'required|max:191',
             'brand'=>'required|max:20',
+            'color'=>'required|max:20',
+            'size'=>'required|max:20',
             'selling_price'=>'required|max:20',
             'original_price'=>'required|max:20',
             'qty'=>'required|max:30',
@@ -46,6 +48,8 @@ class ProductController extends Controller
             $product->selling_price = $request->input('selling_price');
             $product->original_price = $request->input('original_price');
             $product->qty = $request->input('qty');
+            $product->color = $request->input('color');
+            $product->size = $request->input('size');
             if($request->hasFile('image'))
             {
                 $file = $request->file('image');
@@ -102,6 +106,8 @@ class ProductController extends Controller
         'name'=>'required|max:191',
         'meta_title'=>'required|max:191',
         'brand'=>'required|max:20',
+        'color'=>'required|max:20',
+        'size'=>'required|max:20',
         'selling_price'=>'required|max:20',
         'original_price'=>'required|max:20',
         'qty'=>'required|max:30',
@@ -128,6 +134,8 @@ class ProductController extends Controller
         $product->meta_descrip	 = $request->input('meta_descrip');
 
         $product->brand = $request->input('brand');
+        $product->color = $request->input('color');
+        $product->size = $request->input('size');
         $product->selling_price = $request->input('selling_price');
         $product->original_price = $request->input('original_price');
         $product->qty = $request->input('qty');

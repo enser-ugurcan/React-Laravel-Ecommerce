@@ -20,6 +20,8 @@ class CreateProductsTable extends Migration
             $table->string('meta_keyword')->nullable();
             $table->string('meta_descrip')->nullable();
             $table->string('slug');
+            $table->string('size');
+            $table->string('color');
             $table->string('name');
             $table->mediumText('description')->nullable();
             $table->string('brand');
