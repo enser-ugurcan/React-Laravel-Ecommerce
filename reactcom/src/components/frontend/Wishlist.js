@@ -93,7 +93,9 @@ function Cart() {
                     />
                   </td>
                   <td>
-                    <Link to={`/collections/${item.product.slug}/${item.name}`}>
+                    <Link
+                      to={`/collections/${item.product.slug}/${item.product.name}`}
+                    >
                       {item.product.name}
                     </Link>
                   </td>
