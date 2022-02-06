@@ -81,6 +81,7 @@ class CheckoutController extends Controller
                 'city'=>'required|max:191',
                 'state'=>'required|max:191',
                 'zipcode'=>'required|max:191',
+                
             ]);
             if($validator->fails())
             {
@@ -101,6 +102,7 @@ class CheckoutController extends Controller
                 $order->address = $request->address;
                 $order->city = $request->city;
                 $order->state = $request->state;
+
                 $order->zipcode = $request->zipcode;
                 $order->payment_mode = "COD";
                 $order->tracking_no = "Befaecom".rand(1111,9999);

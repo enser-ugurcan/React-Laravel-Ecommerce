@@ -16,7 +16,7 @@ class FrontUserController extends Controller
         if(auth('sanctum')->check())
         { 
              $user_id=auth('sanctum')->user()->id; 
-             $user = User::where('id', $user_id)->get();
+             $user = User::where('id', $user_id)->get()->first();
                     return response()->json([
                         'status'=>200,
                         'user'=>$user,

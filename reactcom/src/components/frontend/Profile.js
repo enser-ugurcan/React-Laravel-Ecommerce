@@ -82,7 +82,7 @@ function Profile() {
       </h4>
     );
   } else {
-    var showuser = "";
+    var showuser = [];
     showuser = user.map((item) => {
       return (
         <div className="container-xl px-4 mt-4">

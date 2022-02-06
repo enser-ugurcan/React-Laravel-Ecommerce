@@ -221,7 +221,7 @@ function Cart() {
                   <strong>${Result}</strong>
                 </dd>
                 <Link to="/checkout" className="btn btn-primary">
-                  checkout
+                  Confirm Cart
                 </Link>
               </dl>
               <hr />
