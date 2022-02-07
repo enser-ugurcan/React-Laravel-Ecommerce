@@ -41,9 +41,6 @@ function EditProduct(props) {
   const handleImage = (e) => {
     setPicture({
       image: e.target.files[0],
-      image_alt_1: e.target.files[0],
-      image_alt_2: e.target.files[0],
-      image_alt_3: e.target.files[0],
     });
   };
 
@@ -74,9 +71,6 @@ function EditProduct(props) {
 
     const formData = new FormData();
     formData.append("image", picture.image);
-    formData.append("image_alt_1", picture.image_alt_1);
-    formData.append("image_alt_2", picture.image_alt_2);
-    formData.append("image_alt_3", picture.image_alt_3);
     formData.append("category_id", productInput.category_id);
     formData.append("slug", productInput.slug);
     formData.append("name", productInput.name);
@@ -369,42 +363,6 @@ function EditProduct(props) {
                       width="50px"
                       alt="adsds"
                     />
-                  </div>
-                  <div className="col-md-8 form-group mb-3">
-                    <label>Alt Image 1</label>
-                    <input
-                      type="file"
-                      name="image_alt_1"
-                      onChange={handleImage}
-                      className="form-control"
-                    />
-                    <small className="text-danger">
-                      {errorlist.image_alt_1}
-                    </small>
-                  </div>
-                  <div className="col-md-8 form-group mb-3">
-                    <label>Alt Image 2</label>
-                    <input
-                      type="file"
-                      name="image_alt_2"
-                      onChange={handleImage}
-                      className="form-control"
-                    />
-                    <small className="text-danger">
-                      {errorlist.image_alt_2}
-                    </small>
-                  </div>
-                  <div className="col-md-8 form-group mb-3">
-                    <label>Alt Image 3</label>
-                    <input
-                      type="file"
-                      name="image_alt_3"
-                      onChange={handleImage}
-                      className="form-control"
-                    />
-                    <small className="text-danger">
-                      {errorlist.image_alt_3}
-                    </small>
                   </div>
                   <div className="col-md-4 form-group mb-3">
                     <label>Featured (checked-shown)</label>

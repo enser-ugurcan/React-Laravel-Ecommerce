@@ -15,6 +15,11 @@ import { FcSearch } from "react-icons/fc";
 function Navbar() {
   const [cart, setCart] = useState([]);
   const history = useHistory();
+
+  const handleInput = (e) => {
+    e.persist();
+    setCart({ ...cart, [e.target.name]: e.target.value });
+  };
   useEffect(() => {
     let isMountered = true;
 
@@ -64,8 +69,7 @@ function Navbar() {
       }
     });
   };
-  const CartCount = cart.count;
-
+  const countcart = cart.length;
   var totalPrice = 0;
   var discount = 0;
   var Result = 0;
@@ -234,9 +238,9 @@ function Navbar() {
                             $ {Result}
                           </span>
                         </div>
-                        <a href="" class="check-out-botton">
-                          Check out
-                        </a>
+                        <Link to="/checkout" class="check-out-botton">
+                          Checkout
+                        </Link>
                       </div>
                     </li>
                     <li>
@@ -257,7 +261,7 @@ function Navbar() {
 
                 <Link className="btn btn-light" to="/cart">
                   <div className="position-absolute top-0 left-100 translate-middle badge bg-danger rounded-circle">
-                    {CartCount}
+                    {countcart}
                   </div>
                 </Link>
               </div>

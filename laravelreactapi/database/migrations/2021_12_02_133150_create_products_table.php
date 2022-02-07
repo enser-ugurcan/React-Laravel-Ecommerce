@@ -29,9 +29,9 @@ class CreateProductsTable extends Migration
             $table->string('original_price');
             $table->string('qty');
             $table->string('image')->nullable();
-            $table->string('image_alt_1')->nullable();
-            $table->string('image_alt_2')->nullable();
-            $table->string('image_alt_3')->nullable();
+            $table->string('image')->nullable();
+            $table->string('image')->nullable();
+            $table->string('image')->nullable();
             $table->tinyInteger('featured')->default('0')->nullable();
             $table->tinyInteger('popular')->default('0')->nullable();
             $table->tinyInteger('status')->default('0')->nullable();

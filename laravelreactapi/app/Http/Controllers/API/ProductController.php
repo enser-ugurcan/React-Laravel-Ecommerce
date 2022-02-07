@@ -24,9 +24,7 @@ class ProductController extends Controller
             'original_price'=>'required|max:20',
             'qty'=>'required|max:30',
             'image'=>'required|image|mimes:jpeg,pjg,png|max:2048',
-            'image_alt_1'=>'required|image|mimes:jpeg,pjg,png|max:2048',
-            'image_alt_2'=>'required|image|mimes:jpeg,pjg,png|max:2048',
-            'image_alt_3'=>'required|image|mimes:jpeg,pjg,png|max:2048',
+
         ]);
         if($validator->fails())
         {
@@ -61,30 +59,7 @@ class ProductController extends Controller
                 
                 $product->image='uploads/product/'.$filename;
             }
-            if($request->hasFile('image_alt_1'))
-            {
-                $file = $request->file('image_alt_1');
-                $extension = $file->getClientOriginalExtension();
-                $filename=time() .'.'.$extension;
-                
-                $product->image='uploads/product_1/'.$filename;
-            }
-            if($request->hasFile('image_alt_2'))
-            {
-                $file = $request->file('image_alt_2');
-                $extension = $file->getClientOriginalExtension();
-                $filename=time() .'.'.$extension;
-                
-                $product->image='uploads/product_2/'.$filename;
-            }
-            if($request->hasFile('image_alt_3'))
-            {
-                $file = $request->file('image_alt_3');
-                $extension = $file->getClientOriginalExtension();
-                $filename=time() .'.'.$extension;
-                
-                $product->image='uploads/product_3/'.$filename;
-            }
+
             $product->featured = $request->input('featured') == true ? '1':'0';
             $product->popular = $request->input('popular') == true ? '1':'0';
             $product->status = $request->input('status') == true ? '1':'0';
@@ -180,46 +155,6 @@ class ProductController extends Controller
             $file->move('uploads/product/', $filename);
             $product->image='uploads/product/'.$filename;
         }
-        if($request->hasFile('image_alt_1'))
-        {
-            $path=$product->image_alt_1;
-            if(File::exists($path))
-            {
-                File::delete($path);
-            }
-            $file = $request->file('image_alt_1');
-            $extension = $file->getClientOriginalExtension();
-            $filename=time() .'.'.$extension;
-            $file->move('uploads/product_1/', $filename);
-            $product->image='uploads/product_1/'.$filename;
-        }
-        if($request->hasFile('image_alt_2'))
-        {
-            $path=$product->image_alt_2;
-            if(File::exists($path))
-            {
-                File::delete($path);
-            }
-            $file = $request->file('image_alt_2');
-            $extension = $file->getClientOriginalExtension();
-            $filename=time() .'.'.$extension;
-            $file->move('uploads/product_2/', $filename);
-            $product->image='uploads/product_2/'.$filename;
-        }
-        if($request->hasFile('image_alt_3'))
-        {
-            $path=$product->image_alt_3;
-            if(File::exists($path))
-            {
-                File::delete($path);
-            }
-            $file = $request->file('image_alt_3');
-            $extension = $file->getClientOriginalExtension();
-            $filename=time() .'.'.$extension;
-            $file->move('uploads/product_3/', $filename);
-            $product->image='uploads/product_3/'.$filename;
-        }
-
         $product->featured = $request->input('featured') ;
         $product->popular = $request->input('popular');
         $product->status = $request->input('status');
@@ -239,4 +174,22 @@ class ProductController extends Controller
         }
      }
   }
+    public function image(Request $request,$id=null)
+    {
+        $product=Product::where(['id'=>$id])->first();
+        if($request->hasfile('image'))
+        {
+            $files= $request->file('iamge');
+            foreach ($files as $file) {
+                $image=new ProductImages;
+                $extension=$file->getClienrOriginalExtension();
+                $filename=rand(111,999).'.'.$extension;
+                $image_path='uploads/product/'.$filename;
+                Image::make($file)->save($image_path);
+                $image->image=$filename;
+                $image->$product_id=$data['product_id'];
+                $image->save();
+            }
+        }
+    }
 }

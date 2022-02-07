@@ -11,6 +11,10 @@ function Cart() {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState([]);
+  const handleInput = (e) => {
+    e.persist();
+    setCart({ ...cart, [e.target.name]: e.target.value });
+  };
   var totalPrice = 0;
   var discount = 0;
   var Result = 0;
