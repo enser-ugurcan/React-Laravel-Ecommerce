@@ -1,7 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faUser } from "@fortawesome/free-solid-svg-icons";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { useState } from "react";
@@ -15,6 +13,22 @@ import { HiOutlineShoppingCart } from "react-icons/hi";
 import { FcSearch } from "react-icons/fc";
 
 function Navbar() {
+  const [cart, setCart] = useState([]);
+  const history = useHistory();
+  useEffect(() => {
+    let isMountered = true;
+
+    axios.get(`/api/cart`).then((res) => {
+      if (isMountered) {
+        if (res.data.status === 200) {
+          setCart(res.data.cart);
+        } else if (res.data.status === 401) {
+          history.push("/");
+          swal("Warning", res.data.message, "error");
+        }
+      }
+    });
+  }, [history]);
   $(document).ready(function () {
     // executes when HTML-Document is loaded and DOM is ready
 
@@ -38,7 +52,7 @@ function Navbar() {
 
     // document ready
   });
-  const history = useHistory();
+
   const logoutSubmit = (e) => {
     e.preventDefault();
     axios.post(`/api/logout`).then((res) => {
@@ -50,26 +64,11 @@ function Navbar() {
       }
     });
   };
-  const [count, setCount] = useState([]);
-  const CartCount = count;
-  console.log("count:", count);
-  useEffect(() => {
-    let isMountered = true;
+  const CartCount = cart.count;
 
-    axios.get(`/api/cart`).then((res) => {
-      if (isMountered) {
-        if (res.data.status === 200) {
-          setCount(res.data.count);
-        } else if (res.data.status === 401) {
-          history.push("/");
-          swal("Warning", res.data.message, "error");
-        }
-      }
-    });
-    return () => {
-      isMountered = false;
-    };
-  }, [history]);
+  var totalPrice = 0;
+  var discount = 0;
+  var Result = 0;
 
   var AuthButton = "";
   if (!localStorage.getItem("auth_token")) {
@@ -164,7 +163,6 @@ function Navbar() {
                     required
                   />
                   <button className="btn btn-outline-primary" type="submit">
-                    {" "}
                     <FcSearch />
                   </button>
                 </div>
@@ -182,9 +180,82 @@ function Navbar() {
                 </Link>
               </div>
               <div className="position-relative d-inline mr-3 col-md-3">
-                <Link className="btn btn-light" to="/cart">
-                  <HiOutlineShoppingCart />
+                <div class="header-right">
+                  <ul>
+                    <li>
+                      <Link to="/cart">
+                        <HiOutlineShoppingCart />
+                      </Link>
+                      <div class="card-hover p-3">
+                        <table class="table table-dark table-hover table-bordered">
+                          <thead>
+                            <tr>
+                              <th class="h-100">image</th>
+                              <th>name</th>
+                              <th>price</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {cart.map((item, idx) => {
+                              totalPrice +=
+                                item.product.selling_price * item.product_qty;
+                              discount = (totalPrice * 10) / 100;
+                              Result = totalPrice - discount;
+                              return (
+                                <tr key={idx}>
+                                  <td>
+                                    <img
+                                      src={`http://localhost:8000/${item.product.image}`}
+                                      alt={item.product.name}
+                                      width="50px"
+                                      height="50px"
+                                    />
+                                  </td>
+                                  <td>
+                                    <p className="text-white">
+                                      {item.product.name}
+                                    </p>
+                                    <small className="text-white">
+                                      Brand:{item.product.brand}
+                                    </small>
+                                  </td>
+                                  <td>
+                                    ${item.product.selling_price}
+                                    <br />
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                        <div class="total-price clearfix">
+                          <span class="float-left total-left">Total:</span>
+                          <span class="float-right total-right">
+                            $ {Result}
+                          </span>
+                        </div>
+                        <a href="" class="check-out-botton">
+                          Check out
+                        </a>
+                      </div>
+                    </li>
+                    <li>
+                      <a href="#">
+                        <i class="fas fa-search"></i>
+                      </a>
+                      <div class="search-box">
+                        <form action="#">
+                          <input type="text" placeholder="Search" />
+                          <button>
+                            <i class="fas fa-search"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
 
+                <Link className="btn btn-light" to="/cart">
                   <div className="position-absolute top-0 left-100 translate-middle badge bg-danger rounded-circle">
                     {CartCount}
                   </div>

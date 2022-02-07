@@ -102,7 +102,6 @@ class CheckoutController extends Controller
                 $order->address = $request->address;
                 $order->city = $request->city;
                 $order->state = $request->state;
-
                 $order->zipcode = $request->zipcode;
                 $order->payment_mode = "COD";
                 $order->tracking_no = "Befaecom".rand(1111,9999);

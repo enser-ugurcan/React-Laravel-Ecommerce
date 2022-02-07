@@ -24,6 +24,9 @@ class ProductController extends Controller
             'original_price'=>'required|max:20',
             'qty'=>'required|max:30',
             'image'=>'required|image|mimes:jpeg,pjg,png|max:2048',
+            'image_alt_1'=>'required|image|mimes:jpeg,pjg,png|max:2048',
+            'image_alt_2'=>'required|image|mimes:jpeg,pjg,png|max:2048',
+            'image_alt_3'=>'required|image|mimes:jpeg,pjg,png|max:2048',
         ]);
         if($validator->fails())
         {
@@ -57,6 +60,30 @@ class ProductController extends Controller
                 $filename=time() .'.'.$extension;
                 
                 $product->image='uploads/product/'.$filename;
+            }
+            if($request->hasFile('image_alt_1'))
+            {
+                $file = $request->file('image_alt_1');
+                $extension = $file->getClientOriginalExtension();
+                $filename=time() .'.'.$extension;
+                
+                $product->image='uploads/product_1/'.$filename;
+            }
+            if($request->hasFile('image_alt_2'))
+            {
+                $file = $request->file('image_alt_2');
+                $extension = $file->getClientOriginalExtension();
+                $filename=time() .'.'.$extension;
+                
+                $product->image='uploads/product_2/'.$filename;
+            }
+            if($request->hasFile('image_alt_3'))
+            {
+                $file = $request->file('image_alt_3');
+                $extension = $file->getClientOriginalExtension();
+                $filename=time() .'.'.$extension;
+                
+                $product->image='uploads/product_3/'.$filename;
             }
             $product->featured = $request->input('featured') == true ? '1':'0';
             $product->popular = $request->input('popular') == true ? '1':'0';
@@ -152,6 +179,45 @@ class ProductController extends Controller
             $filename=time() .'.'.$extension;
             $file->move('uploads/product/', $filename);
             $product->image='uploads/product/'.$filename;
+        }
+        if($request->hasFile('image_alt_1'))
+        {
+            $path=$product->image_alt_1;
+            if(File::exists($path))
+            {
+                File::delete($path);
+            }
+            $file = $request->file('image_alt_1');
+            $extension = $file->getClientOriginalExtension();
+            $filename=time() .'.'.$extension;
+            $file->move('uploads/product_1/', $filename);
+            $product->image='uploads/product_1/'.$filename;
+        }
+        if($request->hasFile('image_alt_2'))
+        {
+            $path=$product->image_alt_2;
+            if(File::exists($path))
+            {
+                File::delete($path);
+            }
+            $file = $request->file('image_alt_2');
+            $extension = $file->getClientOriginalExtension();
+            $filename=time() .'.'.$extension;
+            $file->move('uploads/product_2/', $filename);
+            $product->image='uploads/product_2/'.$filename;
+        }
+        if($request->hasFile('image_alt_3'))
+        {
+            $path=$product->image_alt_3;
+            if(File::exists($path))
+            {
+                File::delete($path);
+            }
+            $file = $request->file('image_alt_3');
+            $extension = $file->getClientOriginalExtension();
+            $filename=time() .'.'.$extension;
+            $file->move('uploads/product_3/', $filename);
+            $product->image='uploads/product_3/'.$filename;
         }
 
         $product->featured = $request->input('featured') ;

@@ -1,9 +1,7 @@
 import React from "react";
 
-function Dashboard(){
-    return(
-        <h1>This is a Dashboard page</h1>
-    );
+function Dashboard() {
+  return <h1>This is the Dashboard page</h1>;
 }
 
 export default Dashboard;

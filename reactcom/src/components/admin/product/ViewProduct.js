@@ -61,6 +61,13 @@ function ViewProduct() {
             />
           </td>
           <td>
+            <img
+              src={`http://localhost:8000/${item.image_alt_1}`}
+              width="50px"
+              alt="asd"
+            />
+          </td>
+          <td>
             <Link
               to={`edit-product/${item.id}`}
               className="btn btn-success btn-sm"

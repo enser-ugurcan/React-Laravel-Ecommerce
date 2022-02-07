@@ -149,14 +149,15 @@ function ProductDetail(props) {
             </Link>
           </li>
           <li className="breadcrumb-item">
-            <Link className="text-decoration-none" to="/collections">
+            <Link
+              className="text-decoration-none"
+              to={`/collections/${product.slug}`}
+            >
               {product.slug}
             </Link>
           </li>
           <li className="breadcrumb-item">
-            <Link to="/#" className="text-decoration-none">
-              {product.name}
-            </Link>
+            <Link className="text-decoration-none">{product.name}</Link>
           </li>
         </ol>
       </nav>
@@ -172,6 +173,24 @@ function ProductDetail(props) {
                 src={`http://localhost:8000/${product.image}`}
                 alt={product.name}
                 className="w-100 img-fluid mb-3"
+              />
+              <img
+                src={`http://localhost:8000/${product.image_alt_1}`}
+                class="border border-secondary mr-2"
+                width="75"
+                alt="..."
+              />
+              <img
+                src={`http://localhost:8000/${product.image_alt_2}`}
+                class="border border-secondary mr-2"
+                width="75"
+                alt="..."
+              />
+              <img
+                src={`http://localhost:8000/${product.image_alt_3}`}
+                class="border border-secondary mr-2"
+                width="75"
+                alt="..."
               />
             </div>
             <div className="col-md-7">

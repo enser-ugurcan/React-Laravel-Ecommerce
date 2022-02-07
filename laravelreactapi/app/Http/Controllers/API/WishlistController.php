@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Wishlist;
+use Illuminate\Support\Facades\Auth;
 
 class WishlistController extends Controller
 {
@@ -17,7 +18,6 @@ class WishlistController extends Controller
             $user_id=auth('sanctum')->user()->id; 
             $product_id = $request->product_id;
             $product_qty = $request->product_qty;
-
             $productCheck = Product::where('id', $product_id)->first();
             if( $productCheck )
             {
@@ -108,6 +108,44 @@ class WishlistController extends Controller
         }
 
     }
-
+    public function addtoWishlistId(Request $request,$id)
+    {
+                $user_id=auth('sanctum')->user()->id;
+                $check=DB::table('wishlist')->where('user_id',$user_id)->where('product_id',$id)->first();
+                $product=DB::table('products')->where('id',$id)->first();
+                if($check)
+                {
+                    return response()->json([
+                        " Already Added to Wishlist",
+                    ]);
+                }
+                else {
+                    $data=array();
+                    $data['product_id']=$id;
+                    $data['user_id']=$user_id;
+                    $data['product_qty']=1;
+                    DB::table('wishlist')->insert($data);
+                    
+                    
+                }
+                $product_id =  $request->id;
+                $product_qty=$request->product_qty;
+                $data = Product::find($product_id);
+               $add = Wishlist::add([
+                   'user_id'=>$user_id,
+                   'product_id'=>$data->product_id,
+                   'product_qty'=>1
+               ]);
+                if($add)
+                {
+                  return response()->json([
+                    'status'=>201,
+                    'message'=>"Added to Wishlist",
+                ]);   
+                }
+               
+            
+    }
 }
+
 

@@ -9,15 +9,35 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import swal from "sweetalert";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import "./style.css";
+import { FcSearch } from "react-icons/fc";
 
 function ViewProduct(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
   const [category, setCategory] = useState([]);
+  const [quantity, setQuantity] = useState(1);
 
   const productCount = product.length;
 
+  const submitAddtoWishlist = (e) => {
+    e.preventDefault();
+    const data = {
+      product_id: product.id,
+      product_qty: quantity,
+    };
+    axios.post(`api/add-to-wishlist`, data).then((res) => {
+      if (res.data.status === 201) {
+        swal("Success", res.data.message, "success");
+      } else if (res.data.status === 409) {
+        swal("Warning", res.data.message, "warning");
+      } else if (res.data.status === 401) {
+        swal("Error", res.data.message, "error");
+      } else if (res.data.status === 404) {
+        swal("Warning", res.data.message, "warning");
+      }
+    });
+  };
   useEffect(() => {
     let isMountered = true;
     const product_slug = props.match.params.slug;
@@ -60,63 +80,64 @@ function ViewProduct(props) {
     if (productCount) {
       showProductList = product.map((item, idx) => {
         return (
-          <div className="col-md-4" key={idx}>
-            <div className="card">
-              <div className="card h-200 shadow-sm">
-                <Link to={`/collections/${item.category.slug}/${item.name}`}>
-                  <img
-                    src={`http://localhost:8000/${item.image}`}
-                    className="mx-auto d-block w-50"
-                    alt={item.name}
-                  />
-                </Link>
-                <div className="label-top shadow-sm">
-                  <Link
-                    to={`/collections/${item.category.slug}/${item.name}`}
-                    className="text-white text-decoration-none"
-                  >
-                    Kargo Bedava
+          <div className="col-md-4 " key={idx}>
+            <div className="card mb-5">
+              <div class="product-wrapper">
+                <div class="product-img">
+                  <Link to={`/collections/${item.category.slug}/${item.name}`}>
+                    {" "}
+                    <img
+                      src={`http://localhost:8000/${item.image}`}
+                      className="mx-auto d-block w-50"
+                      alt={item.name}
+                    />
                   </Link>
-                </div>
-                <div className="card-body">
-                  <div className="clearfix mb-5 mt-3">
-                    <h5 className="card-title">
-                      <Link
-                        to={`/collections/${item.category.slug}/${item.name}`}
-                      >
-                        {item.description}
-                      </Link>
-                    </h5>
-                    <span className="float-start badge rounded-pill bg-success">
-                      {item.selling_price}$
-                    </span>
-                    <del className="small text-muted float-start badge rounded-pill">
-                      {item.original_price}$
-                    </del>
-                  </div>
-                  <div className="card">
-                    <div className="text">
-                      <label>10% discount on cart</label>
-                    </div>
-                  </div>
-                  <div className="d-grid gap-2 my-4">
+                  <div class="product-action">
                     <Link
                       to={`/collections/${item.category.slug}/${item.name}`}
-                      className="btn btn-warning bold-btn"
                     >
-                      View Product
+                      <FcSearch />
                     </Link>
                   </div>
-                  <div className="clearfix mb-1">
-                    <span className="float-start">
-                      <Link to="/#">
-                        <i className="fas fa-question-circle"></i>
-                      </Link>
+                </div>
+                <div class="product-content text-center">
+                  <h3>
+                    <a href="#">{item.description}</a>
+                  </h3>
+                  <div class="rating">
+                    <i class="fas far fa-star"></i>
+                    <i class="fas far fa-star"></i>
+                    <i class="fas far fa-star"></i>
+                    <i class="fas far fa-star"></i>
+                    <i class="fas far fa-star"></i>
+                  </div>
+                  <div class="price">
+                    <span>$ {item.selling_price} </span>
+                    <span>
+                      <del>${item.original_price}</del>
                     </span>
-
-                    <span className="float-end">
-                      <i className="far fa-heart"></i>
-                    </span>
+                  </div>
+                  <div class="cart-btn">
+                    <form action="" method="POST" class="cart-and-action">
+                      <div class="">
+                        <div class="float-left">
+                          <input
+                            type="hidden"
+                            name="product_quantity"
+                            value="1"
+                          />
+                          <input type="hidden" name="product_id" value="" />
+                        </div>
+                      </div>
+                      <div class="cart-pro">
+                        <button
+                          class="btn btn-outline-dark btn-lg "
+                          type="submit"
+                        >
+                          Sepette %10 İndirim
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -157,12 +178,18 @@ function ViewProduct(props) {
             </Link>
           </li>
           <li className="breadcrumb-item">
-            <Link className="text-decoration-none" to="/Collections">
+            <Link
+              to={`/collections/${category.slug}`}
+              className="text-decoration-none"
+            >
               {category.name}
             </Link>
           </li>
           <li className="breadcrumb-item">
-            <Link to="/#" className="text-decoration-none">
+            <Link
+              to={`/collections/${category.slug}`}
+              className="text-decoration-none"
+            >
               {category.slug}
             </Link>
           </li>
@@ -345,7 +372,9 @@ function ViewProduct(props) {
               </div>
             </div>
             <hr />
-            <div className="row g-4">{showProductList}</div>
+            <div className="container">
+              <div className="row">{showProductList}</div>
+            </div>
           </div>
         </div>
       </div>
