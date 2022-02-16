@@ -24,6 +24,8 @@ Route::post('login',[AuthController::class,'login']);
 
 Route::post('contact', [FrontendController::class,'contact']);
 Route::get('getCategory', [FrontendController::class,'category']);
+Route::get('search/{key}',[FrontendController::class,'search']);
+Route::get('price',[FrontendController::class,'price']);
 Route::get('orders', [FrontendController::class,'orders']);
 Route::get('fetchproducts/{slug}', [FrontendController::class,'product']);
 Route::get('viewproductdetails/{category_slug}/{product_name}', [FrontendController::class,'viewproduct']);
@@ -38,6 +40,7 @@ Route::delete('delete-wishlistitem/{wishlist_id}',[WishlistController::class, 'd
 Route::get('userprofile',[FrontUserController::class , 'profile']);
 Route::post('update-user',[FrontUserController::class , 'update']);
   
+
 
 Route::post('forgot' , [ForgotController::class, 'forgot']);
 Route::post('reset' , [ForgotController::class, 'reset']);
@@ -73,6 +76,7 @@ Route::middleware(['auth:sanctum', 'isAPIAdmin'])->group(function(){
     Route::get('view-product',[ProductController::class,'index']);
     Route::get('edit-product/{id}',[ProductController::class,'edit']);
     Route::post('update-product/{id}',[ProductController::class,'update']);
+  
 
 });
 

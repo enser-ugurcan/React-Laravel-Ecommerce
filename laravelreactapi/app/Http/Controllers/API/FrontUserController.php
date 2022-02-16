@@ -16,7 +16,7 @@ class FrontUserController extends Controller
         if(auth('sanctum')->check())
         { 
              $user_id=auth('sanctum')->user()->id; 
-             $user = User::where('id', $user_id)->get()->first();
+             $user = User::where('id', $user_id)->get();
                     return response()->json([
                         'status'=>200,
                         'user'=>$user,
@@ -28,7 +28,12 @@ class FrontUserController extends Controller
                 'status'=>401,
                 'message'=>"Login to View User Data",
             ]);
-        }
+        }  /*
+        $user_id=auth('sanctum')->user(); 
+        return response()->json([
+            'status'=>200,
+            'user'=>$user_id,
+        ]);  */  
     
     }
     public function update(Request $request)

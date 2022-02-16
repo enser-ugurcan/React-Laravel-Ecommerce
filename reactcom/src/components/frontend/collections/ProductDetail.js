@@ -7,12 +7,13 @@ import { Spinner, Button } from "react-bootstrap";
 import swal from "sweetalert";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import { FaRegHeart, FaRegUser } from "react-icons/fa";
-import img1 from "../../../images/1.jpg";
+import ImageZoom from "react-image-zooom";
 
 function ProductDetail(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
+  const [products, setProductt] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [cart, setCart] = useState([]);
 
@@ -31,6 +32,8 @@ function ProductDetail(props) {
         if (isMountered) {
           if (res.data.status === 200) {
             setProduct(res.data.product);
+            setProductt(res.data.products);
+            console.log(res.data.products);
             setLoading(false);
           } else if (res.data.status === 404) {
             history.push("/collections");
@@ -90,9 +93,8 @@ function ProductDetail(props) {
       }
     });
   };
-  const refreshPage = () => {
-    window.location.reload();
-  };
+  const productCount = product.length;
+  const image = `http://localhost:8000/${product.image}`;
   if (loading) {
     return (
       <h4>
@@ -145,6 +147,29 @@ function ProductDetail(props) {
       );
     }
   }
+  var showProductList = "";
+  if (true) {
+    showProductList = products.map((item, idx) => {
+      return (
+        <div class="row mb-3" key={idx}>
+          <div class="col-md-4">
+            <Link to={`/collections/${item.category.slug}/${item.name}`}>
+              <img
+                src={`http://localhost:8000/${item.image}`}
+                className="mx-auto d-block w-100"
+                alt={item.name}
+              />
+            </Link>
+          </div>
+          <div class="col-md-8">
+            <h6 class="text-capitalize mb-1">{item.name}</h6>
+            <span class="font-weight-bold h5">${item.selling_price}</span>
+            <del class="small text-muted mx-2">${item.original_price}</del>
+          </div>
+        </div>
+      );
+    });
+  }
   return (
     <div>
       <nav aria-label="breadcrumb">
@@ -172,7 +197,6 @@ function ProductDetail(props) {
           </li>
         </ol>
       </nav>
-
       <div className="row">
         <div className="col-md-8 mx-5">
           <div className="row mb-3">
@@ -180,25 +204,25 @@ function ProductDetail(props) {
               <span className="float-start badge btn-sm btn-danger badge-pil">
                 {product.brand}
               </span>
-              <img
+              <ImageZoom
                 src={`http://localhost:8000/${product.image}`}
-                alt={product.name}
-                className="w-100 img-fluid mb-3"
+                alt="A image to apply the ImageZoom plugin"
+                zoom="200"
               />
-              <img
-                src={`http://localhost:8000/${product.image_alt_1}`}
+              <ImageZoom
+                src={`http://localhost:8000/${product.image}`}
                 class="border border-secondary mr-2"
                 width="75"
                 alt="..."
               />
-              <img
-                src={`http://localhost:8000/${product.image_alt_2}`}
+              <ImageZoom
+                src={`http://localhost:8000/${product.image}`}
                 class="border border-secondary mr-2"
                 width="75"
                 alt="..."
               />
-              <img
-                src={`http://localhost:8000/${product.image_alt_3}`}
+              <ImageZoom
+                src={`http://localhost:8000/${product.image}`}
                 class="border border-secondary mr-2"
                 width="75"
                 alt="..."
@@ -308,80 +332,7 @@ function ProductDetail(props) {
             <div class="card-header font-weight-bold text-uppercase">
               Featured Products
             </div>
-            <div class="card-body">
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <img
-                    src={`http://localhost:8000/${product.image}`}
-                    alt={product.name}
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-8">
-                  <h6 class="text-capitalize mb-1">{product.name}</h6>
-                  <span class="font-weight-bold h5">
-                    ${product.selling_price}
-                  </span>
-                  <del class="small text-muted mx-2">
-                    ${product.original_price}
-                  </del>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <img
-                    src={`http://localhost:8000/${product.image}`}
-                    alt={product.name}
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-8">
-                  <h6 class="text-capitalize mb-1">{product.name}</h6>
-                  <span class="font-weight-bold h5">
-                    ${product.selling_price}
-                  </span>
-                  <del class="small text-muted mx-2">
-                    ${product.original_price}
-                  </del>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <img
-                    src={`http://localhost:8000/${product.image}`}
-                    alt={product.name}
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-8">
-                  <h6 class="text-capitalize mb-1">{product.name}</h6>
-                  <span class="font-weight-bold h5">
-                    ${product.selling_price}
-                  </span>
-                  <del class="small text-muted mx-2">
-                    ${product.original_price}
-                  </del>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-4">
-                  <img
-                    src={`http://localhost:8000/${product.image}`}
-                    alt={product.name}
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-8">
-                  <h6 class="text-capitalize mb-1">{product.name}</h6>
-                  <span class="font-weight-bold h5">
-                    ${product.selling_price}
-                  </span>
-                  <del class="small text-muted mx-2">
-                    ${product.original_price}
-                  </del>
-                </div>
-              </div>
-            </div>
+            <div class="card-body">{showProductList}</div>
           </div>
         </div>
         <div className="col-md-4 border-end"></div>

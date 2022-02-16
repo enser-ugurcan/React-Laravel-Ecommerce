@@ -22,7 +22,7 @@ function User() {
       isMounted = false;
     };
   }, []);
-
+  const userCount = users.length;
   var display_Users = "";
   if (loading) {
     return (
@@ -63,6 +63,9 @@ function User() {
     <div className="card px-4 mt-3">
       <div className="card-header">
         <h4>Users</h4>
+      </div>
+      <div className="card-header">
+        <h4>Number Of User : {userCount}</h4>
       </div>
       <div className="card-body">
         <div className="table-responsive">

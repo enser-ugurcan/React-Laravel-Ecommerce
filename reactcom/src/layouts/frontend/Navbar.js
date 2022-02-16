@@ -190,58 +190,6 @@ function Navbar() {
                       <Link to="/cart">
                         <HiOutlineShoppingCart />
                       </Link>
-                      <div class="card-hover p-3">
-                        <table class="table table-dark table-hover table-bordered">
-                          <thead>
-                            <tr>
-                              <th class="h-100">image</th>
-                              <th>name</th>
-                              <th>price</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {cart.map((item, idx) => {
-                              totalPrice +=
-                                item.product.selling_price * item.product_qty;
-                              discount = (totalPrice * 10) / 100;
-                              Result = totalPrice - discount;
-                              return (
-                                <tr key={idx}>
-                                  <td>
-                                    <img
-                                      src={`http://localhost:8000/${item.product.image}`}
-                                      alt={item.product.name}
-                                      width="50px"
-                                      height="50px"
-                                    />
-                                  </td>
-                                  <td>
-                                    <p className="text-white">
-                                      {item.product.name}
-                                    </p>
-                                    <small className="text-white">
-                                      Brand:{item.product.brand}
-                                    </small>
-                                  </td>
-                                  <td>
-                                    ${item.product.selling_price}
-                                    <br />
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                        <div class="total-price clearfix">
-                          <span class="float-left total-left">Total:</span>
-                          <span class="float-right total-right">
-                            $ {Result}
-                          </span>
-                        </div>
-                        <Link to="/checkout" class="check-out-botton">
-                          Checkout
-                        </Link>
-                      </div>
                     </li>
                     <li>
                       <a href="#">
@@ -261,7 +209,7 @@ function Navbar() {
 
                 <Link className="btn btn-light" to="/cart">
                   <div className="position-absolute top-0 left-100 translate-middle badge bg-danger rounded-circle">
-                    {countcart}
+                    {}
                   </div>
                 </Link>
               </div>
@@ -417,8 +365,11 @@ function Navbar() {
                                   </span>
                                   <ul className="nav flex-column">
                                     <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
+                                      <Link
+                                        className="nav-link active"
+                                        to="/collections/Shoes"
+                                      >
+                                        Shoe
                                       </Link>
                                     </li>
                                     <li className="nav-item">

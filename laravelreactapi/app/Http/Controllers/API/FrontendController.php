@@ -9,6 +9,8 @@ use App\Models\Order;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use ProtoneMedia\LaravelCrossEloquentSearch\Search;
+use Illuminate\Support\Facades\DB;
 
 class FrontendController extends Controller
 {
@@ -26,6 +28,7 @@ class FrontendController extends Controller
         if($category)
         {
             $product = Product::where('category_id',$category->id)->where('status','0')->get();
+
             if($product)
             {
                 return response()->json([
@@ -63,9 +66,12 @@ class FrontendController extends Controller
                               ->first();
             if($product)
             {
+                $products = Product::all();
+                $products=Product::where('slug','like','%'.$category_slug.'%')->get();
                 return response()->json([
                     'status'=>200,
                     'product'=>$product,
+                    'products'=>$products
                 ]);
             }
             else
@@ -83,6 +89,23 @@ class FrontendController extends Controller
                 'message'=>"No Such Category Found"
             ]);
         }
+    }
+    public function search(Request $request)      
+    {  
+         $result=Product::where('name','LIKE','%'.$request->name.'%')->get();
+         return response()->json([
+            'status'=>200,
+            'result'=>$result
+        ]);
+    }
+    public function price(Request $request)
+    {
+        $query = Product::query();
+        if($sort=$request->input('sort'))
+        {
+           $query->orderBy('selling_price',$sort);
+        }
+        return $query->get();
     }
     public function orders(){
         if(auth('sanctum')->check())

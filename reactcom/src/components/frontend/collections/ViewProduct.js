@@ -16,28 +16,9 @@ function ViewProduct(props) {
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
   const [category, setCategory] = useState([]);
-  const [quantity, setQuantity] = useState(1);
 
   const productCount = product.length;
 
-  const submitAddtoWishlist = (e) => {
-    e.preventDefault();
-    const data = {
-      product_id: product.id,
-      product_qty: quantity,
-    };
-    axios.post(`api/add-to-wishlist`, data).then((res) => {
-      if (res.data.status === 201) {
-        swal("Success", res.data.message, "success");
-      } else if (res.data.status === 409) {
-        swal("Warning", res.data.message, "warning");
-      } else if (res.data.status === 401) {
-        swal("Error", res.data.message, "error");
-      } else if (res.data.status === 404) {
-        swal("Warning", res.data.message, "warning");
-      }
-    });
-  };
   useEffect(() => {
     let isMountered = true;
     const product_slug = props.match.params.slug;
@@ -85,7 +66,6 @@ function ViewProduct(props) {
               <div class="product-wrapper">
                 <div class="product-img">
                   <Link to={`/collections/${item.category.slug}/${item.name}`}>
-                    {" "}
                     <img
                       src={`http://localhost:8000/${item.image}`}
                       className="mx-auto d-block w-50"
@@ -356,7 +336,7 @@ function ViewProduct(props) {
               <div className="col-md-8">
                 <span className="align-middle font-weight-bold ">
                   {productCount} result for
-                  <span className="text-warning mx-2">"{category.slug}"</span>
+                  <span className="text-warning mx-2">"{category.name}"</span>
                 </span>
               </div>
               <div className="col-md-4">

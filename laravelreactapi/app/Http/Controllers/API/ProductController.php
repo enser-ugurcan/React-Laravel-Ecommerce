@@ -109,7 +109,7 @@ class ProductController extends Controller
         'meta_title'=>'required|max:191',
         'brand'=>'required|max:20',
         'color'=>'required|max:20',
-        'size'=>'required|max:20',
+        'size'=>'max:20',
         'selling_price'=>'required|max:20',
         'original_price'=>'required|max:20',
         'qty'=>'required|max:30',

@@ -1,6 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {} from "@fortawesome/react-fontawesome";
+import { Dropdown } from "react-bootstrap";
+import {
+  AiOutlineDashboard,
+  AiOutlineOrderedList,
+  AiOutlineContacts,
+} from "react-icons/ai";
+import { BiCategoryAlt, BiUser } from "react-icons/bi";
+import { FaProductHunt } from "react-icons/fa";
 
 const Sidebar = () => {
   return (
@@ -12,72 +20,110 @@ const Sidebar = () => {
         <div className="sb-sidenav-menu">
           <div className="nav">
             <div className="sb-sidenav-menu-heading"></div>
-            <Link className="nav-link" to="/admin/dashboard">
-              <div className="sb-nav-link-icon">
-                <i className="fas fa-tachometer-alt"></i>
-              </div>
-              Dashboard
+            <Link className="header__menu mobile-menu" to="/admin/dashboard">
+              <ul>
+                <li>
+                  <Link
+                    className="text-decoration-none text-white"
+                    to="/admin/dashboard"
+                  >
+                    <AiOutlineDashboard /> Dashboard
+                  </Link>
+                </li>
+              </ul>
             </Link>
-            <Link className="nav-link" to="/admin/add-category">
-              <div className="sb-nav-link-icon">
-                <i className="fas fa-tachometer-alt"></i>
-              </div>
-              Add Category
+            <nav className="header__menu mobile-menu">
+              <ul>
+                <li>
+                  <Link className="text-decoration-none text-white" to="#">
+                    <BiCategoryAlt /> Category
+                  </Link>
+                  <ul className="dropdown">
+                    <li>
+                      <Link
+                        className="nav-link text-white"
+                        to="/admin/add-category"
+                      >
+                        <div className="sb-nav-link-icon"></div>
+                        Add Category
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className="nav-link text-white"
+                        to="/admin/view-category"
+                      >
+                        <div className="sb-nav-link-icon"></div>
+                        View Category
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+            <nav className="header__menu mobile-menu">
+              <ul>
+                <li>
+                  <Link className="text-decoration-none text-white" to="#">
+                    <FaProductHunt />
+                    Product
+                  </Link>
+                  <ul className="dropdown">
+                    <li>
+                      <Link
+                        className="nav-link text-white"
+                        to="/admin/add-product"
+                      >
+                        Add Product
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className="nav-link text-white"
+                        to="/admin/view-product"
+                      >
+                        View Product
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+            <Link className="header__menu mobile-menu" to="/admin/orders">
+              <ul>
+                <li>
+                  <Link
+                    className="text-decoration-none text-white"
+                    to="/admin/orders"
+                  >
+                    <AiOutlineOrderedList /> Orders
+                  </Link>
+                </li>
+              </ul>
             </Link>
-            <Link className="nav-link" to="/admin/view-category">
-              <div className="sb-nav-link-icon">
-                <i className="fas fa-tachometer-alt"></i>
-              </div>
-              View Category
+            <Link className="header__menu mobile-menu" to="/admin/users">
+              <ul>
+                <li>
+                  <Link
+                    className="text-decoration-none text-white"
+                    to="/admin/users"
+                  >
+                    <BiUser /> Users
+                  </Link>
+                </li>
+              </ul>
             </Link>
-            <Link
-              className="nav-link collapsed"
-              to="/#"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseProduct"
-              aria-expanded="false"
-              aria-controls="collapseLayouts"
-            >
-              <div className="sb-nav-link-icon">
-                <i className="fas fa-columns"></i>
-              </div>
-              Products
-              <div className="sb-sidenav-collapse-arrow">
-                <i className="fas fa-angle-down"></i>
-              </div>
-            </Link>
-            <div
-              className="collapse"
-              id="collapseProduct"
-              aria-labelledby="headingOne"
-              data-bs-parent="#sidenavAccordion"
-            >
-              <nav className="sb-sidenav-menu-nested nav">
-                <Link className="nav-link" to="/admin/add-product">
-                  Add Product
-                </Link>
-                <Link className="nav-link" to="/admin/view-product">
-                  View Product
-                </Link>
-              </nav>
-            </div>
-            <Link className="nav-link" to="/admin/orders">
-              <div className="sb-nav-link-icon">
-                <i className="fas fa-tachometer-alt"></i>
-              </div>
-              Orders
-            </Link>
-            <Link className="nav-link" to="/admin/users">
-              <div className="sb-nav-link-icon">
-                <i className="fas fa-tachometer-alt"></i>
-              </div>
-              Users
-            </Link>
-            <Link className="nav-link" to="/admin/contact">
-              <div className="sb-nav-link-icon">
-                <i className="fas fa-tachometer-alt"></i>
-              </div>
-              Contacts
+            <Link className="header__menu mobile-menu" to="/admin/contact">
+              <ul>
+                <li>
+                  <Link
+                    className="text-decoration-none text-white"
+                    to="/admin/contact"
+                  >
+                    <AiOutlineContacts /> Contact
+                  </Link>
+                </li>
+              </ul>
             </Link>
           </div>
         </div>

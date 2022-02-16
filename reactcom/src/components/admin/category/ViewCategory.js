@@ -104,7 +104,7 @@ function ViewCategory() {
               <tr>
                 <th scope="col">ID</th>
                 <th scope="col">Name</th>
-                <th scope="col">Slug</th>
+                <th scope="col">Sub Category Name</th>
                 <th scope="col">Description</th>
                 <th scope="col">Status</th>
                 <th scope="col">Meta Title</th>
