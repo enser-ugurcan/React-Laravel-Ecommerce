@@ -10,37 +10,130 @@ import swal from "sweetalert";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import "./style.css";
 import { FcSearch } from "react-icons/fc";
+import XMLParser from "react-xml-parser";
+import { useTheme, useThemeUpdate } from "../../../Contexts/CurrencyContext";
+import { YearViewService } from "@progress/kendo-react-dateinputs/dist/npm/calendar/services";
+import GlobalContext from "../../../Contexts/GlobalContext";
+import { useContext } from "react";
+import { Dropdown } from "react-bootstrap";
+import { DropdownButton } from "react-bootstrap";
+
+const BASE_URL =
+  "http://api.exchangeratesapi.io/v1/latest?access_key=6f398b79d13b5c3d9b17c0d6b9832ece";
 
 function ViewProduct(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
   const [category, setCategory] = useState([]);
+  const [trcategory, setTrCategory] = useState([]);
+  const [productDescription, setproductDescription] = useState([]);
+  const [currencyOptions, setCurrencyOptions] = useState([]);
+  const [price, setPrice] = useState([]);
+  const [pricelow, setPricelow] = useState([]);
+  const [brand, setBrand] = useState([]);
+  const [parent, setParent] = useState([]);
+  const [commentt, setCommentt] = useState([]);
 
+  const darkTheme = useTheme();
+  const currencySymbols = [
+    {
+      name: "EUR",
+      symbol: "€",
+    },
+    {
+      name: "TRY",
+      symbol: "₺",
+    },
+    {
+      name: "USD",
+      symbol: "$",
+    },
+  ];
+
+  useEffect(() => {
+    fetch(BASE_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        setCurrencyOptions([data.rates]);
+      });
+  }, []);
   const productCount = product.length;
+
+  const fullCurrency = (symbol) => {
+    let t = "";
+    currencySymbols.forEach((v) => {
+      if (v["name"] == symbol) {
+        t = v["symbol"];
+      }
+    });
+    return t;
+  };
+
+  const adjustCurrency = (currency) => {
+    for (const [key, value] of Object.entries(currencyOptions[0])) {
+      if (key == darkTheme) {
+        const s = fullCurrency(key);
+        return `${s} ` + Math.floor(currency * value);
+      }
+    }
+  };
+
+  const globalContext = useContext(GlobalContext);
 
   useEffect(() => {
     let isMountered = true;
     const product_slug = props.match.params.slug;
-    axios.get(`/api/fetchproducts/${product_slug}`).then((res) => {
-      if (isMountered) {
-        if (res.data.status === 200) {
-          setProduct(res.data.product_data.product);
-          setCategory(res.data.product_data.category);
-          setLoading(false);
-        } else if (res.data.status === 400) {
-          swal("Warning", res.data.message, "");
-        } else if (res.data.status === 404) {
-          history.push("/collections");
-          swal("Warning", res.data.message, "error");
+    //    const id = props.match.params.id;
+    console.log(props.match.params);
+    axios
+      .get(`/api/fetchproducts/${product_slug}?lang=${globalContext.language}`)
+      .then((res) => {
+        if (isMountered) {
+          if (res.data.status === 200) {
+            setProduct(res.data.product_data.product);
+            setCategory(res.data.product_data.category);
+            setPrice(res.data.product_data.price);
+            setPricelow(res.data.product_data.priceLow);
+            setBrand(res.data.product_data.brand);
+            setParent(res.data.product_data.parent_id);
+            setCommentt(res.data.ValueOfCommentRating);
+            console.log(res.data.product_data.product);
+            console.log(res.data.ValueOfCommentRating);
+            console.log(res.data.product_data.parent_id);
+            console.log(res.data.product_data.category);
+            console.log(res.data.product_data.product);
+            console.log(res.data.product_data.brand);
+            console.log(res.data.product_data.price);
+            console.log(res.data.product_data.priceLow);
+            setLoading(false);
+          } else if (res.data.status === 400) {
+            swal("Warning", res.data.message, "");
+          } else if (res.data.status === 404) {
+            history.push("/collections");
+            swal("Warning", res.data.message, "error");
+          }
         }
-      }
-    });
+      });
 
     return () => {
       isMountered = false;
     };
   }, [props.match.params.slug, history]);
+  var filters = "";
+  if (productCount) {
+    filters = product.map((item, idx) => {
+      return (
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">
+            <Link className="text-black-50 text-decoration-none">
+              {item.brand}
+            </Link>
+          </li>
+        </ul>
+      );
+    });
+  }
   if (loading) {
     return (
       <h4>
@@ -52,7 +145,7 @@ function ViewProduct(props) {
             role="status"
             aria-hidden="true"
           />
-          Loading Category...
+          Kategori yükleniyor
         </Button>
       </h4>
     );
@@ -65,37 +158,28 @@ function ViewProduct(props) {
             <div className="card mb-5">
               <div class="product-wrapper">
                 <div class="product-img">
-                  <Link to={`/collections/${item.category.slug}/${item.name}`}>
+                  <Link to={`/collections/${item.category.id}/${item.id}`}>
                     <img
-                      src={`http://localhost:8000/${item.image}`}
+                      src="https://cartzilla.createx.studio/img/home/mono-product/hero-bg.jpg"
                       className="mx-auto d-block w-50"
                       alt={item.name}
                     />
                   </Link>
                   <div class="product-action">
-                    <Link
-                      to={`/collections/${item.category.slug}/${item.name}`}
-                    >
+                    <Link to={`/collections/${item.category.id}/${item.id}`}>
                       <FcSearch />
                     </Link>
                   </div>
                 </div>
                 <div class="product-content text-center">
                   <h3>
-                    <a href="#">{item.description}</a>
+                    <Link to={`/collections/${item.category.id}/${item.id}`}>
+                      {item.name}
+                    </Link>
                   </h3>
-                  <div class="rating">
-                    <i class="fas far fa-star"></i>
-                    <i class="fas far fa-star"></i>
-                    <i class="fas far fa-star"></i>
-                    <i class="fas far fa-star"></i>
-                    <i class="fas far fa-star"></i>
-                  </div>
+
                   <div class="price">
-                    <span>$ {item.selling_price} </span>
-                    <span>
-                      <del>${item.original_price}</del>
-                    </span>
+                    <span>{adjustCurrency(item.selling_price)}</span>
                   </div>
                   <div class="cart-btn">
                     <form action="" method="POST" class="cart-and-action">
@@ -109,14 +193,7 @@ function ViewProduct(props) {
                           <input type="hidden" name="product_id" value="" />
                         </div>
                       </div>
-                      <div class="cart-pro">
-                        <button
-                          class="btn btn-outline-dark btn-lg "
-                          type="submit"
-                        >
-                          Sepette %10 İndirim
-                        </button>
-                      </div>
+                      <div class="cart-pro">Quick View</div>
                     </form>
                   </div>
                 </div>
@@ -128,25 +205,10 @@ function ViewProduct(props) {
     } else {
       showProductList = (
         <div className="col-md-12">
-          <h4>No Product Available for {category.name}</h4>
+          <h4>No Product Available for {category.slug}</h4>
         </div>
       );
     }
-  }
-  var filters = "";
-  if (productCount) {
-    filters = product.map((item, idx) => {
-      return (
-        <ul className="list-group list-group-flush">
-          <li className="list-group-item">
-            {" "}
-            <Link className="text-black-50 text-decoration-none">
-              {item.brand}
-            </Link>
-          </li>
-        </ul>
-      );
-    });
   }
   return (
     <div>
@@ -162,7 +224,7 @@ function ViewProduct(props) {
               to={`/collections/${category.slug}`}
               className="text-decoration-none"
             >
-              {category.name}
+              {category.parent_id}
             </Link>
           </li>
           <li className="breadcrumb-item">
@@ -170,7 +232,7 @@ function ViewProduct(props) {
               to={`/collections/${category.slug}`}
               className="text-decoration-none"
             >
-              {category.slug}
+              {category.id}
             </Link>
           </li>
         </ol>
@@ -178,8 +240,8 @@ function ViewProduct(props) {
 
       <div className="container-fluid mb-3">
         <div className="row">
-          <div className="col-md-3">
-            <div className="card mb-3">
+          {/* <div className="col-md-">
+             <div className="card mb-3">
               <div className="font-monospace fw-bold card-header font-weight-bold text-uppercase">
                 Related categories
               </div>
@@ -190,10 +252,11 @@ function ViewProduct(props) {
                   </Link>
                 </li>
               </ul>
-            </div>
-            <div className="col-md-12 mb-4">
+            </div> 
+             <div className="col-md-12 mb-4">
               <form className="d-flex">
                 <div className="input-group">
+                  categoryres
                   <input
                     id="search"
                     name="search"
@@ -209,9 +272,8 @@ function ViewProduct(props) {
                 </div>
               </form>
             </div>
-            <div className="card mb-3">
-              <div className="card-header fw-bold text-uppercase">Brand</div>
-              {filters}
+             <div className="card mb-3">
+              <div className="card-header fw-bold text-uppercase"></div>
             </div>
             <div className="card mb-3">
               <div className="fw-bold card-header font-weight-bold text-uppercase">
@@ -328,27 +390,15 @@ function ViewProduct(props) {
                   </div>
                 </li>
               </ul>
-            </div>
-          </div>
+            </div> 
+          </div> */}
 
-          <div className="col-md-9">
+          <div className="col-md-12">
             <div className="row">
               <div className="col-md-8">
                 <span className="align-middle font-weight-bold ">
-                  {productCount} result for
-                  <span className="text-warning mx-2">"{category.name}"</span>
+                  {productCount} result for Product
                 </span>
-              </div>
-              <div className="col-md-4">
-                <select
-                  className="form-select w-100 float-left"
-                  aria-label="Default select"
-                >
-                  <option value="1">Most Popular</option>
-                  <option value="2">Latest items</option>
-                  <option value="3">Price low to high</option>
-                  <option value="4">Price high to low</option>
-                </select>
               </div>
             </div>
             <hr />

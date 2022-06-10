@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 
 class ForgotController extends Controller
@@ -28,12 +29,21 @@ class ForgotController extends Controller
                'message'=>'User doesn\t exist'
            ]);
        }
+
        $token=Str::random(10);
        DB::table('password_resets')->insert(['email'=>$email,
        'token'=>$token, 'created_at'=>Carbon::now()]);
 
        $passwordReset = DB::table('password_resets')->where
        ('token',$token)->first();
+
+       Mail::send('auth.password.reset',['token' => $token],
+       function($message) use ($request){
+           $message->to('befa@gmail.com','Befa Shopping')->subject('Reset Password Notification');
+        //    $message->from($request->email);
+        //    $message->to('befa@gmail.com');
+        //    $message->subject('Reset Password Notification');
+       });
        return response([
            'status'=>200,
            'message'=>'Check your email',

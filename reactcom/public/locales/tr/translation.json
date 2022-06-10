@@ -1,0 +1,39 @@
+{
+    "title":"türkçe",
+    "description":{
+        "part1":"Giriş",
+        "part2":"türkçe part 2 "
+    },
+    "top_navbar":
+    {
+        "contact":"İletişim",
+        "about":"Hakkımıza"
+    },
+    "navbar":{
+        "Women":"Kadın",
+        "Men":"Erkek",
+        "Furniture":"Mobilya",
+        "Fashion":"Moda",
+        "Garden":"Bahçe ve Dışarı",
+        "Jewellery":"Takı",
+        "Electronic":"Elektronik"
+    },
+    "navbarItems":{
+        "Computer&Tablet":"Bilgisayar & Tablet",
+        "Computer&TabletItems":{
+            "Laptop":"Laptop",
+            "Tablet":"Tablet",
+            "Monitor":"Monitor"
+        },
+        "Phone":"Telefon",
+        "PhoneItems":{
+            "MobilePhone":"Cep Telefonu"
+        },
+        "TV":"TV & Görüntü & Ses",
+        "TvItems":{
+            "Television":"Televizyon"
+        }
+        
+    }
+    
+}

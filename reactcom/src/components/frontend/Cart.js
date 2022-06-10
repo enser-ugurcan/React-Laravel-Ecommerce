@@ -6,6 +6,12 @@ import { Link, useHistory } from "react-router-dom";
 import { Spinner, Button } from "react-bootstrap";
 import swal from "sweetalert";
 import { FaTimes, FaRegHeart, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import {
+  useTheme,
+  useThemeUpdate,
+} from "../../../src/Contexts/CurrencyContext";
+const BASE_URL =
+  "http://api.exchangeratesapi.io/v1/latest?access_key=6f398b79d13b5c3d9b17c0d6b9832ece";
 
 function Cart() {
   const history = useHistory();
@@ -14,6 +20,48 @@ function Cart() {
   const handleInput = (e) => {
     e.persist();
     setCart({ ...cart, [e.target.name]: e.target.value });
+  };
+  const [currencyOptions, setCurrencyOptions] = useState([]);
+  const darkTheme = useTheme();
+  const currencySymbols = [
+    {
+      name: "TRY",
+      symbol: "₺",
+    },
+    {
+      name: "USD",
+      symbol: "$",
+    },
+    {
+      name: "EUR",
+      symbol: "€",
+    },
+  ];
+  useEffect(() => {
+    fetch(BASE_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        setCurrencyOptions([data.rates]);
+      });
+  }, []);
+
+  const fullCurrency = (symbol) => {
+    let t = "";
+    currencySymbols.forEach((v) => {
+      if (v["name"] == symbol) {
+        t = v["symbol"];
+      }
+    });
+    return t;
+  };
+
+  const adjustCurrency = (currency) => {
+    for (const [key, value] of Object.entries(currencyOptions[0])) {
+      if (key == darkTheme) {
+        const s = fullCurrency(key);
+        return `${s} ` + Math.floor(currency * value);
+      }
+    }
   };
   var totalPrice = 0;
   var discount = 0;
@@ -125,8 +173,7 @@ function Cart() {
                 <tbody>
                   {cart.map((item, idx) => {
                     totalPrice += item.product.selling_price * item.product_qty;
-                    discount = (totalPrice * 10) / 100;
-                    Result = totalPrice - discount;
+                    Result = totalPrice;
                     return (
                       <tr key={idx}>
                         <td>
@@ -176,10 +223,12 @@ function Cart() {
                         </td>
                         <td>
                           <var className="price">
-                            ${item.product.selling_price * item.product_qty}
+                            {adjustCurrency(
+                              item.product.selling_price * item.product_qty
+                            )}
                           </var>
                           <small className="d-block text-muted">
-                            ${item.product.selling_price} each
+                            {adjustCurrency(item.product.selling_price)} each
                           </small>
                         </td>
                         <td className="text-right">
@@ -215,14 +264,14 @@ function Cart() {
             <div className="card-body">
               <dl className="row border-bottom">
                 <dt className="col-6">Total price:</dt>
-                <dd className="col-6 text-right">${totalPrice}</dd>
-                <dt className="col-6 text-success">Discount:</dt>
-                <dd className="col-6 text-success text-right">-${discount}</dd>
+                <dd className="col-6 text-right">
+                  {adjustCurrency(totalPrice)}
+                </dd>
               </dl>
               <dl className="row">
                 <dt className="col-6">Total:</dt>
                 <dd className="col-6 text-right h5">
-                  <strong>${Result}</strong>
+                  <strong>{adjustCurrency(Result)}</strong>
                 </dd>
                 <Link to="/checkout" className="btn btn-primary">
                   Confirm Cart

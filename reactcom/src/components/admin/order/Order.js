@@ -47,14 +47,8 @@ function Order() {
           <td>{item.tracking_no}</td>
           <td>{item.phone}</td>
           <td>{item.email}</td>
-          <td>
-            <Link
-              to={`view-order/${item.id}`}
-              className="btn btn-success btn-sm"
-            >
-              View
-            </Link>
-          </td>
+          <td>{item.address}</td>
+          <td>{item.state}</td>
         </tr>
       );
     });
@@ -73,7 +67,8 @@ function Order() {
                 <th>Tracking No</th>
                 <th>Phone No</th>
                 <th>Email</th>
-                <th>Action</th>
+                <th>Address</th>
+                <th>State</th>
               </tr>
             </thead>
             <tbody>{display_Orders}</tbody>

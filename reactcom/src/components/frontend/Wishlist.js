@@ -6,12 +6,58 @@ import { Link, useHistory } from "react-router-dom";
 import { Spinner, Button } from "react-bootstrap";
 import swal from "sweetalert";
 import { FaTimes, FaRegHeart, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { useTheme, useThemeUpdate } from "../../Contexts/CurrencyContext";
+const BASE_URL =
+  "http://api.exchangeratesapi.io/v1/latest?access_key=6f398b79d13b5c3d9b17c0d6b9832ece";
 
 function Cart() {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [wishlist, setWishlist] = useState([]);
+  const [currencyOptions, setCurrencyOptions] = useState([]);
 
+  const darkTheme = useTheme();
+  const currencySymbols = [
+    {
+      name: "EUR",
+      symbol: "€",
+    },
+    {
+      name: "TRY",
+      symbol: "₺",
+    },
+    {
+      name: "USD",
+      symbol: "$",
+    },
+  ];
+
+  useEffect(() => {
+    fetch(BASE_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        setCurrencyOptions([data.rates]);
+      });
+  }, []);
+
+  const fullCurrency = (symbol) => {
+    let t = "";
+    currencySymbols.forEach((v) => {
+      if (v["name"] == symbol) {
+        t = v["symbol"];
+      }
+    });
+    return t;
+  };
+
+  const adjustCurrency = (currency) => {
+    for (const [key, value] of Object.entries(currencyOptions[0])) {
+      if (key == darkTheme) {
+        const s = fullCurrency(key);
+        return `${s} ` + Math.floor(currency * value);
+      }
+    }
+  };
   if (!localStorage.getItem("auth_token")) {
     history.push("/");
     swal("Warning", "Login to go to Wishlist Page", "error");
@@ -115,7 +161,9 @@ function Cart() {
                         </td>
                         <td>
                           <var className="price">
-                            ${item.product.selling_price * item.product_qty}
+                            {adjustCurrency(
+                              item.product.selling_price * item.product_qty
+                            )}
                           </var>
                         </td>
                         <td className="text-right">

@@ -1,34 +1,40 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import swal from "sweetalert";
 import { Spinner, Button } from "react-bootstrap";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import GlobalContext from "../../../Contexts/GlobalContext";
 
 function EditProduct(props) {
   const history = useHistory();
   const [categorylist, setCategorylist] = useState([]);
+  const [language, setLanguage] = useState([]);
+  const [descriptions, setDescriptions] = useState({});
   const [productInput, setProduct] = useState({
     category_id: "",
     slug: "",
     name: "",
-    description: "",
-
-    meta_title: "",
-    meta_keyword: "",
-    meta_descrip: "",
-    color: "",
-    size: "",
-
     selling_price: "",
     original_price: "",
     qty: "",
+    featured: "",
+    popular: "",
+    status: "",
+    size: "",
+    color: "",
     brand: "",
+    description: "",
+    meta_title: "",
   });
   const [picture, setPicture] = useState([]);
   const [errorlist, setError] = useState([]);
   const [allcheckbox, setCheckboxes] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const globalContext = useContext(GlobalContext);
 
   const handleInput = (e) => {
     e.persist();
@@ -43,6 +49,14 @@ function EditProduct(props) {
       image: e.target.files[0],
     });
   };
+  useEffect(() => {
+    axios.get("/api/language").then((res) => {
+      if (res.data.status === 200) {
+        setLanguage(res.data.languages);
+        console.log(res.data.languages);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     axios.get("/api/all-category").then((res) => {
@@ -54,8 +68,21 @@ function EditProduct(props) {
     const product_id = props.match.params.id;
     axios.get(`/api/edit-product/${product_id}`).then((res) => {
       if (res.data.status === 200) {
+        console.log(res.data);
         setProduct(res.data.product);
         setCheckboxes(res.data.product);
+
+        const deneme = res.data.product.product_descriptions.map((des) => {
+          return des.description;
+        });
+
+        let arr = [];
+
+        deneme.forEach((den, index) => {
+          arr[`desc_${index}`] = den;
+        });
+
+        setDescriptions(arr);
       } else if (res.data.status === 404) {
         swal("Error", res.data.message, "error");
         history.push("/admin/view-product");
@@ -74,23 +101,45 @@ function EditProduct(props) {
     formData.append("category_id", productInput.category_id);
     formData.append("slug", productInput.slug);
     formData.append("name", productInput.name);
-    formData.append("description", productInput.description);
-
-    formData.append("meta_title", productInput.meta_title);
-    formData.append("meta_keyword", productInput.meta_keyword);
-    formData.append("meta_descrip", productInput.meta_descrip);
-
-    formData.append("color", productInput.color);
-    formData.append("size", productInput.size);
     formData.append("selling_price", productInput.selling_price);
     formData.append("original_price", productInput.original_price);
     formData.append("qty", productInput.qty);
-    formData.append("brand", productInput.brand);
     formData.append("featured", allcheckbox.featured ? "1" : "0");
     formData.append("popular", allcheckbox.popular ? "1" : "0");
     formData.append("status", allcheckbox.status ? "1" : "0");
+    formData.append("color", productInput.color);
+    formData.append("size", productInput.size);
+    formData.append("brand", productInput.brand);
 
-    axios.post(`/api/update-product/${product_id}`, formData).then((res) => {
+    const data = new FormData(e.target);
+    const obj = Object.fromEntries(data.entries());
+
+    const obj2 = Object.fromEntries(formData.entries());
+
+    const denem = { ...obj, ...descriptions };
+
+    console.log("DENEM", denem);
+
+    let arr = [];
+    language.forEach((lang, index) => {
+      const data = {
+        language_id: lang.id,
+        description: denem[`desc_${index}`],
+        title: denem[`title${index}`],
+      };
+      arr = [data, ...arr];
+      // console.log(data.get(`slug_${index}`));
+      // console.log(data.get(`desc_${index}`));
+      // console.log(data.get(`meta_title_${index}`));
+    });
+
+    console.log("ARR", arr);
+
+    const sendData = { ...obj2, category_desc_arr: arr };
+
+    console.log("DATA", sendData);
+
+    axios.post(`/api/update-product/${product_id}`, sendData).then((res) => {
       if (res.data.status === 200) {
         swal("Success", res.data.message, "success");
         console.log(allcheckbox);
@@ -120,6 +169,7 @@ function EditProduct(props) {
       </h4>
     );
   }
+
   return (
     <div className="container-flıid px-4">
       <div className="card mt-4">
@@ -154,20 +204,6 @@ function EditProduct(props) {
               <li className="nav-item" role="presentation">
                 <button
                   className="nav-link"
-                  id="seotags-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#seotags"
-                  type="button"
-                  role="tab"
-                  aria-controls="seotags"
-                  aria-selected="false"
-                >
-                  SEO Tags
-                </button>
-              </li>
-              <li className="nav-item" role="presentation">
-                <button
-                  className="nav-link"
                   id="otherdetails-tab"
                   data-bs-toggle="tab"
                   data-bs-target="#otherdetails"
@@ -177,6 +213,34 @@ function EditProduct(props) {
                   aria-selected="false"
                 >
                   Other Details
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link"
+                  id="attribute-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#attribute"
+                  type="button"
+                  role="tab"
+                  aria-controls="attribute"
+                  aria-selected="false"
+                >
+                  Attribute
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link"
+                  id="description-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#description"
+                  type="button"
+                  role="tab"
+                  aria-controls="description"
+                  aria-selected="false"
+                >
+                  Description
                 </button>
               </li>
             </ul>
@@ -198,23 +262,12 @@ function EditProduct(props) {
                     {categorylist.map((item) => {
                       return (
                         <option value={item.id} key={item.id}>
-                          {item.slug}
+                          {item.title}
                         </option>
                       );
                     })}
                   </select>
                   <small className="text-danger">{errorlist.category_id}</small>
-                </div>
-                <div className="form-group mb-3">
-                  <label>Slug</label>
-                  <input
-                    type="text"
-                    name="slug"
-                    onChange={handleInput}
-                    value={productInput.slug}
-                    className="form-control"
-                  />
-                  <small className="text-danger">{errorlist.slug}</small>
                 </div>
                 <div className="form-group mb-3">
                   <label>Name</label>
@@ -228,49 +281,15 @@ function EditProduct(props) {
                   <small className="text-danger">{errorlist.name}</small>
                 </div>
                 <div className="form-group mb-3">
-                  <label>Description</label>
-                  <textarea
-                    type="text"
-                    name="description"
-                    onChange={handleInput}
-                    value={productInput.description}
-                    className="form-control"
-                  ></textarea>
-                </div>
-              </div>
-              <div
-                className="tab-pane card-body boder fade"
-                id="seotags"
-                role="tabpanel"
-                aria-labelledby="seotags-tab"
-              >
-                <div className="form-group mb-3">
-                  <label>Meta Title</label>
+                  <label>Slug</label>
                   <input
-                    name="meta_title"
+                    type="text"
+                    name="slug"
                     onChange={handleInput}
-                    value={productInput.meta_title}
+                    value={productInput.slug}
                     className="form-control"
                   />
-                  <small className="text-danger">{errorlist.meta_title}</small>
-                </div>
-                <div className="form-group mb-3">
-                  <label>Meta Keyword</label>
-                  <textarea
-                    name="meta_keyword"
-                    onChange={handleInput}
-                    value={productInput.meta_keyword}
-                    className="form-control"
-                  ></textarea>
-                </div>
-                <div className="form-group mb-3">
-                  <label>Meta Description</label>
-                  <textarea
-                    name="meta_descrip"
-                    onChange={handleInput}
-                    value={productInput.meta_descrip}
-                    className="form-control"
-                  ></textarea>
+                  <small className="text-danger">{errorlist.slug}</small>
                 </div>
               </div>
               <div
@@ -317,53 +336,22 @@ function EditProduct(props) {
                     />
                     <small className="text-danger">{errorlist.qty}</small>
                   </div>
-                  <div className="col-md-4 form-group mb-3">
-                    <label>Color</label>
-                    <input
-                      type="text"
-                      name="color"
-                      onChange={handleInput}
-                      value={productInput.color}
-                      className="form-control"
-                    />
-                    <small className="text-danger">{errorlist.color}</small>
-                  </div>
-                  <div className="col-md-4 form-group mb-3">
-                    <label>Size</label>
-                    <input
-                      type="text"
-                      name="size"
-                      onChange={handleInput}
-                      value={productInput.size}
-                      className="form-control"
-                    />
-                    <small className="text-danger">{errorlist.size}</small>
-                  </div>
-                  <div className="col-md-4 form-group mb-3">
-                    <label>Brand</label>
-                    <input
-                      type="text"
-                      name="brand"
-                      onChange={handleInput}
-                      value={productInput.brand}
-                      className="form-control"
-                    />
-                    <small className="text-danger">{errorlist.brand}</small>
-                  </div>
+
                   <div className="col-md-8 form-group mb-3">
                     <label>Image</label>
                     <input
                       type="file"
                       name="image"
                       onChange={handleImage}
+                      value={productInput.image}
                       className="form-control"
                     />
                     <img
                       src={`http://localhost:8000/${productInput.image}`}
                       width="50px"
-                      alt="adsds"
                     />
                   </div>
+
                   <div className="col-md-4 form-group mb-3">
                     <label>Featured (checked-shown)</label>
                     <input
@@ -394,6 +382,144 @@ function EditProduct(props) {
                       className="w-50 h-50"
                     />
                   </div>
+                </div>
+              </div>
+              <div
+                className="tab-pane card-body boder fade"
+                id="attribute"
+                role="tabpanel"
+                aria-labelledby="attribute-tab"
+              >
+                <div className="col-md-4 form-group mb-3">
+                  <label>Color</label>
+                  <input
+                    type="text"
+                    name="color"
+                    onChange={handleInput}
+                    value={productInput.color}
+                    className="form-control"
+                  />
+                  <small className="text-danger">{errorlist.qty}</small>
+                </div>
+                <div className="col-md-4 form-group mb-3">
+                  <label>Size</label>
+                  <input
+                    type="text"
+                    name="size"
+                    onChange={handleInput}
+                    value={productInput.size}
+                    className="form-control"
+                  />
+                  <small className="text-danger">{errorlist.qty}</small>
+                </div>
+                <div className="col-md-4 form-group mb-3">
+                  <label>Brand</label>
+                  <input
+                    type="text"
+                    name="brand"
+                    onChange={handleInput}
+                    value={productInput.brand}
+                    className="form-control"
+                  />
+                  <small className="text-danger">{errorlist.brand}</small>
+                </div>
+              </div>
+              <div
+                className="tab-pane card-body boder fade"
+                id="description"
+                role="tabpanel"
+                aria-labelledby="description-tab"
+              >
+                {" "}
+                <div className="card-body">
+                  <ul
+                    className="nav nav-pills mb-3"
+                    id="pills-tab"
+                    role="tablist"
+                  >
+                    {language.map((item, index) => (
+                      <li className="nav-item" role="presentation">
+                        <button
+                          className={`${
+                            index === 0 ? "nav-link active" : "nav-link"
+                          }`}
+                          id={`nav-${item.id}-tab`}
+                          data-bs-toggle="tab"
+                          data-bs-target={`#nav-${item.id}`}
+                          type="button"
+                          role="tab"
+                          aria-controls={`nav-${item.id}`}
+                          aria-selected="true"
+                        >
+                          {item.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="tab-content" id="pills-tabContent">
+                    {language.map((item, index) => {
+                      return (
+                        <div
+                          className={`${
+                            index === 0
+                              ? "tab-pane fade show active"
+                              : "tab-pane fade"
+                          }`}
+                          id={`nav-${item.id}`}
+                          role="tabpanel"
+                          aria-labelledby={`nav-${item.id}`}
+                        >
+                          <div
+                            className="tab-pane card-body border fade show active"
+                            id={item.name}
+                            role="tabpanel"
+                            aria-labelledby={`${item.name}-tab`}
+                          >
+                            <div className="form-group mb-3">
+                              <label>Description</label>
+                              <CKEditor
+                                id={`desc_${index}`}
+                                editor={ClassicEditor}
+                                data={
+                                  productInput.product_descriptions.find(
+                                    (desc) => {
+                                      return desc.language.name === item.name;
+                                    }
+                                  ).description
+                                }
+                                onChange={(event, editor) => {
+                                  //const data =
+                                  const oldData = { ...descriptions };
+                                  console.log("olddata1", oldData);
+
+                                  oldData[`desc_${index}`] = editor.getData();
+                                  console.log("BUNU GONDERİTORUZ", oldData);
+                                  setDescriptions(oldData);
+                                  //console.log(data);
+                                  //setCategory({ ...categoryInput, descrip: data });
+                                }}
+                                onBlur={(event, editor) => {
+                                  //console.log("Blur.", editor);
+                                }}
+                                onFocus={(event, editor) => {
+                                  //console.log("Focus.", editor);
+                                }}
+                              />
+                            </div>
+                            <div className="form-group mb-3">
+                              <label>Title</label>
+                              <input
+                                name={`title${index}`}
+                                className="form-control"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <br />
                 </div>
               </div>
             </div>

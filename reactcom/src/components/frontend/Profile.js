@@ -14,7 +14,7 @@ function Profile() {
 
   const history = useHistory();
   const [loading, setLoading] = useState(true);
-  const [user, setUserr] = useState("");
+  const [user, setUserr] = useState([]);
   const [errorlist, setError] = useState([]);
   const [picture, setPicture] = useState([]);
   const [userInput, setUser] = useState({

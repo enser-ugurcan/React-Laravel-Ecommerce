@@ -40,9 +40,6 @@ function Contact() {
           width="600"
           height="450"
           allowfullscreen=""
-          height="500"
-          allowfullscreen=""
-          aria-hidden="false"
           tabindex="0"
         ></iframe>
       </div>

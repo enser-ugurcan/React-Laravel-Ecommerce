@@ -83,7 +83,7 @@ function Register() {
                                 value={RegisterInput.email}
                                 className="form-control"
                                 placeholder="example@hotmail.com"
-                                placeholder="Email"
+                                placeholder="E-mail"
                               />
                               <span>{RegisterInput.error_list.email}</span>
                             </div>

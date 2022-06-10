@@ -8,14 +8,16 @@ import forgotPassword from "../components/frontend/auth/ForgotPassword";
 import resetPassword from "../components/frontend/auth/resetPassword";
 import ViewCategory from "../components/frontend/collections/ViewCategory";
 import ViewProduct from "../components/frontend/collections/ViewProduct";
-import Content from "../layouts/frontend/Content";
 import ProductDetail from "../components/frontend/collections/ProductDetail";
+import Content from "../layouts/frontend/Content";
 import Cart from "../components/frontend/Cart";
 import Wishlist from "../components/frontend/Wishlist";
 import Checkout from "../components/frontend/Checkout";
 import Profile from "../components/frontend/Profile";
 import Myorders from "../components/frontend/Myorders";
 import Help from "../components/frontend/Help";
+import Comment from "../components/frontend/Comment";
+import Search from "../components/frontend/Search";
 const PublicRoutelist = [
   { path: "/", exact: true, name: "Home", component: Content },
   { path: "/about", exact: true, name: "About", component: About },
@@ -23,6 +25,7 @@ const PublicRoutelist = [
   { path: "/403", exact: true, name: "Page403", component: Page403 },
   { path: "/404", exact: true, name: "page404", component: Page404 },
   { path: "/login", exact: true, name: "Login", component: Login },
+
   {
     path: "/forgotPassword",
     exact: true,
@@ -38,7 +41,12 @@ const PublicRoutelist = [
   { path: "/register", exact: true, name: "Register", component: Register },
   { path: "/orders", exact: true, name: "Myorders", component: Myorders },
   { path: "/help", exact: true, name: "Help", component: Help },
-
+  {
+    path: "/search/:key",
+    exact: true,
+    name: "Search",
+    component: Search,
+  },
   {
     path: "/collections",
     exact: true,
@@ -56,6 +64,12 @@ const PublicRoutelist = [
     exact: true,
     name: "ProductDetail",
     component: ProductDetail,
+  },
+  {
+    path: "/collections/:category/:product/:id/comment",
+    exact: true,
+    name: "Comment",
+    component: Comment,
   },
   {
     path: "/cart",

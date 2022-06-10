@@ -24,6 +24,11 @@ class CheckoutController extends Controller
                 'city'=>'required|max:191',
                 'state'=>'required|max:191',
                 'zipcode'=>'required|max:191',
+                'cardname'=>'required',
+                'cardnumber'=>'required|max:16',
+                'expirationmonth'=>'required|max:2',
+                'expirationyear'=>'required|max:2',
+                'cvv'=>'required|max:3'
             ]);
             if($validator->fails())
             {
@@ -45,6 +50,11 @@ class CheckoutController extends Controller
                 $order->city = $request->city;
                 $order->state = $request->state;
                 $order->zipcode = $request->zipcode;
+                $order->cardname = $request->cardname;
+                $order->cardnumber = $request->cardnumber;
+                $order->expirationmonth = $request->expirationmonth;
+                $order->expirationyear = $request->expirationyear;
+                $order->cvv = $request->cvv;
                 $order->payment_mode = "COD";
                 $order->tracking_no = "Befaecom".rand(1111,9999);
                 $order->save();
@@ -81,6 +91,11 @@ class CheckoutController extends Controller
                 'city'=>'required|max:191',
                 'state'=>'required|max:191',
                 'zipcode'=>'required|max:191',
+                'cardname'=>'required',
+                'cardnumber'=>'required',
+                'expirationmonth'=>'required',
+                'expirationyear'=>'required',
+                'cvv'=>'required'
                 
             ]);
             if($validator->fails())
@@ -103,6 +118,11 @@ class CheckoutController extends Controller
                 $order->city = $request->city;
                 $order->state = $request->state;
                 $order->zipcode = $request->zipcode;
+                $order->cardname = $request->cardname;
+                $order->cardnumber = $request->cardnumber;
+                $order->expirationmonth = $request->expirationmonth;
+                $order->expirationyear = $request->expirationyear;
+                $order->cvv = $request->cvv;
                 $order->payment_mode = "COD";
                 $order->tracking_no = "Befaecom".rand(1111,9999);
                 $order->save();

@@ -5,12 +5,21 @@ import axios from "axios";
 import swal from "sweetalert";
 import { Spinner, Button } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 function EditCategory(props) {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
   const [categoryInput, setCategory] = useState([]);
-  const [error, setError] = useState([]);
+  const [category, setCategorylist] = useState([]);
+  const [language, setLanguage] = useState([]);
+  const [descriptions, setDescriptions] = useState({});
+  const [errorlist, setError] = useState([]);
+  const [parent, setParent] = useState([]);
+  const [parentNull, setParentNull] = useState([]);
+  const [topcategory, setTopcategory] = useState([]);
+  const [parentAll, setParentAll] = useState([]);
 
   useEffect(() => {
     const category_id = props.match.params.id;
@@ -24,6 +33,42 @@ function EditCategory(props) {
       setLoading(false);
     });
   }, [props.match.params.id, history]);
+  useEffect(() => {
+    axios.get("/api/language").then((res) => {
+      if (res.data.status === 200) {
+        setLanguage(res.data.languages);
+        console.log(res.data.languages);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    axios.get("/api/parent").then((res) => {
+      if (res.data.status === 200) {
+        setParent(res.data.parentNotNull);
+        setParentNull(res.data.parentNull);
+        setParentAll(res.data.parentAll);
+        console.log(res.data.parentNotNull);
+        console.log(res.data.parentNull);
+        console.log(res.data.parentAll);
+
+        //console.log(res.data.languages);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    axios.get("/api/all-category").then((res) => {
+      if (res.data.status === 200) {
+        setCategorylist(res.data.category);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    axios.get("/api/all-topcategory").then((res) => {
+      if (res.data.status === 200) {
+        setTopcategory(res.data.category);
+      }
+    });
+  }, []);
 
   const handleInput = (e) => {
     e.persist();
@@ -31,7 +76,9 @@ function EditCategory(props) {
   };
   const updateCategory = (e) => {
     e.preventDefault();
-
+    //console.log(data.values());
+    const obj = Object.fromEntries(data.entries());
+    const denem = { ...obj, ...descriptions };
     const category_id = props.match.params.id;
     const data = categoryInput;
     axios.put(`/api/update-category/${category_id}`, data).then((res) => {
@@ -40,6 +87,7 @@ function EditCategory(props) {
         setError([]);
       } else if (res.data.status === 422) {
         swal("All fields are mandatory", "", "error");
+        setCategory({ ...categoryInput, error_list: res.data.errors });
         setError(res.data.errors);
       } else if (res.data.status === 404) {
         swal("Error", res.data.message, "error");
@@ -47,6 +95,15 @@ function EditCategory(props) {
       }
     });
   };
+  var display_errors = [];
+  if (categoryInput.error_list) {
+    display_errors = [
+      categoryInput.error_list.slug,
+      categoryInput.error_list.language_id,
+      categoryInput.error_list.parent_id,
+      categoryInput.error_list.meta_title,
+    ];
+  }
   if (loading) {
     return (
       <h4>
@@ -79,125 +136,148 @@ function EditCategory(props) {
           </h4>
         </div>
         <div className="card-body">
-          <form onSubmit={updateCategory}>
-            <ul className="nav nav-tabs" id="myTab" role="tablist">
+          <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            {language.map((item, index) => (
               <li className="nav-item" role="presentation">
                 <button
-                  className="nav-link active"
-                  id="home-tab"
+                  className={`${index === 0 ? "nav-link active" : "nav-link"}`}
+                  id={`nav-${item.id}-tab`}
                   data-bs-toggle="tab"
-                  data-bs-target="#home"
+                  data-bs-target={`#nav-${item.id}`}
                   type="button"
                   role="tab"
-                  aria-controls="home"
+                  aria-controls={`nav-${item.id}`}
                   aria-selected="true"
                 >
-                  Home
+                  {item.name}
                 </button>
               </li>
-              <li className="nav-item" role="presentation">
-                <button
-                  className="nav-link"
-                  id="seo-tags-tab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#seo-tags"
-                  type="button"
-                  role="tab"
-                  aria-controls="seo-tags"
-                  aria-selected="false"
+            ))}
+            <li className="nav-item" role="presentation">
+              <button
+                className={"nav-link"}
+                id={`nav-data-tab`}
+                data-bs-toggle="tab"
+                data-bs-target={`#nav-data`}
+                type="button"
+                role="tab"
+                aria-controls={`nav-data`}
+                aria-selected="true"
+              >
+                Data
+              </button>
+            </li>
+          </ul>
+          <form onSubmit={{ updateCategory }} id="CATEGORY_FORM">
+            <div className="tab-content" id="pills-tabContent">
+              {language.map((item, index) => {
+                return (
+                  <div
+                    className={`${
+                      index === 0
+                        ? "tab-pane fade show active"
+                        : "tab-pane fade"
+                    }`}
+                    id={`nav-${item.id}`}
+                    role="tabpanel"
+                    aria-labelledby={`nav-${item.id}`}
+                  >
+                    <div
+                      className="tab-pane card-body border fade show active"
+                      id={item.name}
+                      role="tabpanel"
+                      aria-labelledby={`${item.name}-tab`}
+                    >
+                      <div className="form-group mb-3">
+                        <label>Slug</label>
+                        <input
+                          name="slug"
+                          type="text"
+                          onChange={handleInput}
+                          value={categoryInput.slug}
+                          className="form-control"
+                        />
+                      </div>
+
+                      <div className="form-group mb-3">
+                        <label>Description</label>
+                        <CKEditor
+                          id={`desc_${index}`}
+                          editor={ClassicEditor}
+                          name="description"
+                          className="form-control"
+                          onChange={handleInput}
+                          value={categoryInput.description}
+                          data=""
+                          onBlur={(event, editor) => {
+                            //console.log("Blur.", editor);
+                          }}
+                          onFocus={(event, editor) => {
+                            //console.log("Focus.", editor);
+                          }}
+                        />
+                      </div>
+                      <div className="form-group mb-3">
+                        <label>Meta Title</label>
+                        <input
+                          name={`meta_title_${index}`}
+                          className="form-control"
+                          value={categoryInput.meta_title}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div
+                className={"tab-pane fade"}
+                id={`nav-data`}
+                role="tabpanel"
+                aria-labelledby={`nav-data`}
+              >
+                <div
+                  className="tab-pane card-body border fade show active"
+                  id={"data"}
+                  role="tabpanel"
+                  aria-labelledby={`${"data"}-tab`}
                 >
-                  SEO Tags
-                </button>
-              </li>
-            </ul>
-            <div className="tab-content" id="myTabContent">
-              <div
-                className="tab-pane card-body border fade show active"
-                id="home"
-                role="tabpanel"
-                aria-labelledby="home-tab"
-              >
-                <div className="form-group mb-3">
-                  <label>Slug</label>
-                  <input
-                    name="slug"
-                    type="text"
-                    onChange={handleInput}
-                    value={categoryInput.slug}
-                    className="form-control"
-                  />
-                  <small className="text-danger">{error.slug}</small>
-                </div>
-                <div className="form-group mb-3">
-                  <label>Name</label>
-                  <input
-                    name="name"
-                    type="text"
-                    onChange={handleInput}
-                    value={categoryInput.name}
-                    className="form-control"
-                  />
-                  <small className="text-danger">{error.name}</small>
-                </div>
-                <div className="form-group mb-3">
-                  <label>Description</label>
-                  <textarea
-                    name="description"
-                    className="form-control"
-                    onChange={handleInput}
-                    value={categoryInput.description}
-                  ></textarea>
-                </div>
-                <div className="form-group mb-3 ">
-                  <label>Status</label>
-                  <input
-                    name="status"
-                    type="checkbox"
-                    onChange={handleInput}
-                    value={categoryInput.status}
-                  />{" "}
-                  (Status 0=Shown / 1=Hidden)
-                </div>
-              </div>
-              <div
-                className="tab-pane card-body border fade"
-                id="seo-tags"
-                role="tabpanel"
-                aria-labelledby="seo-tags-tab"
-              >
-                <div className="form-group mb-3">
-                  <label>Meta Title</label>
-                  <input
-                    name="meta_title"
-                    onChange={handleInput}
-                    value={categoryInput.meta_title}
-                    className="form-control"
-                  />
-                  <small className="text-danger">{error.meta_title}</small>
-                </div>
-                <div className="form-group mb-3">
-                  <label>Meta Keyword</label>
-                  <textarea
-                    name="meta_keyword"
-                    onChange={handleInput}
-                    value={categoryInput.meta_keyword}
-                    className="form-control"
-                  ></textarea>
-                </div>
-                <div className="form-group mb-3">
-                  <label>Meta Description</label>
-                  <textarea
-                    name="meta_descrip"
-                    onChange={handleInput}
-                    value={categoryInput.meta_descrip}
-                    className="form-control"
-                  ></textarea>
+                  <div className="form-group mb-3">
+                    <label>Select Category</label>
+                    <select
+                      name="parent_id"
+                      onChange={handleInput}
+                      value={categoryInput.parent_id}
+                      className="form-control"
+                    >
+                      {" "}
+                      <option value="">-----Select Category--------</option>
+                      {topcategory.map((item) => {
+                        return (
+                          <option value={item.id} key={item.id}>
+                            {item.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <small className="text-danger">{errorlist.parent_id}</small>
+                  </div>
+
+                  <div className="form-group mb-3 ">
+                    <label>Status</label>
+                    <input
+                      name="status"
+                      type="checkbox"
+                      onChange={handleInput}
+                      value={categoryInput.status}
+                    />{" "}
+                    (Status 0=Shown / 1=Hidden)
+                  </div>
                 </div>
               </div>
             </div>
             <br />
             <button type="submit" className="btn btn-primary px-4">
-              Update
+              Submit
             </button>
           </form>
         </div>

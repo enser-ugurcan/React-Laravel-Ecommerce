@@ -125,6 +125,58 @@ const Sidebar = () => {
                 </li>
               </ul>
             </Link>
+            <Link className="header__menu mobile-menu" to="/admin/contact">
+              <ul>
+                <li>
+                  <Link
+                    className="text-decoration-none text-white"
+                    to="/admin/add-language"
+                  >
+                    <AiOutlineContacts /> Add Language
+                  </Link>
+                </li>
+              </ul>
+            </Link>
+            <nav className="header__menu mobile-menu">
+              <ul>
+                <li>
+                  <Link className="text-decoration-none text-white" to="#">
+                    <FaProductHunt />
+                    Langauge
+                  </Link>
+                  <ul className="dropdown">
+                    <li>
+                      <Link
+                        className="nav-link text-white"
+                        to="/admin/add-language"
+                      >
+                        Add Language
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        className="nav-link text-white"
+                        to="/admin/view-language"
+                      >
+                        View Language
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </nav>
+            <Link className="header__menu mobile-menu" to="/admin/contact">
+              <ul>
+                <li>
+                  <Link
+                    className="text-decoration-none text-white"
+                    to="/admin/edit-setting/1"
+                  >
+                    <AiOutlineContacts /> Setting
+                  </Link>
+                </li>
+              </ul>
+            </Link>
           </div>
         </div>
       </nav>

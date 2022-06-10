@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
@@ -11,10 +11,44 @@ import { useEffect } from "react";
 import { FaRegHeart, FaRegUser } from "react-icons/fa";
 import { HiOutlineShoppingCart } from "react-icons/hi";
 import { FcSearch } from "react-icons/fc";
+import { Trans, useTranslation } from "react-i18next";
+import { changeLanguage } from "i18next";
+import { Dropdown } from "react-bootstrap";
+import ReactHtmlParser from "react-html-parser";
+
+import { useTheme, useThemeUpdate } from "../../Contexts/CurrencyContext";
+import GlobalContext from "../../Contexts/GlobalContext";
 
 function Navbar() {
   const [cart, setCart] = useState([]);
+  const [category, setCategory] = useState([]);
   const history = useHistory();
+  const [loading, setLoading] = useState(true);
+  const [show, setShow] = useState([]);
+  const [language, setLanguage] = useState([]);
+  const [flag, setFlage] = useState(false);
+  const darkTheme = useTheme();
+  const toggleTheme = useThemeUpdate();
+
+  const globalContext = useContext(GlobalContext);
+
+  // const themeStyles = {
+  //   backgroundColor: darkTheme ? "red" : "blue",
+  // };
+  useEffect(() => {
+    let isMountered = true;
+    axios.get(`/api/getCategory?lang=${globalContext.language}`).then((res) => {
+      //  console.log(`/api/getCategory?lang=${globalContext.language}`);
+      if (isMountered) {
+        if (res.data.status === 200) {
+          setCategory(res.data.categories);
+        }
+      }
+    });
+    return () => {
+      isMountered = false;
+    };
+  }, [globalContext.language]);
 
   const handleInput = (e) => {
     e.persist();
@@ -57,7 +91,6 @@ function Navbar() {
 
     // document ready
   });
-
   const logoutSubmit = (e) => {
     e.preventDefault();
     axios.post(`/api/logout`).then((res) => {
@@ -69,10 +102,25 @@ function Navbar() {
       }
     });
   };
+
+  const { t, i18n } = useTranslation();
+  const ChangeLanguage = (language) => {
+    i18n.changeLanguage(language);
+  };
+
   const countcart = cart.length;
   var totalPrice = 0;
   var discount = 0;
   var Result = 0;
+  useEffect(() => {
+    axios.get("/api/language").then((res) => {
+      if (res.data.status === 200) {
+        setLanguage(res.data.languages);
+
+        //console.log(res.data.languages);
+      }
+    });
+  }, []);
 
   var AuthButton = "";
   if (!localStorage.getItem("auth_token")) {
@@ -81,7 +129,11 @@ function Navbar() {
         <div className="col-md-8">
           <div className="position-relative d-inline">
             <Link className="btn btn-outline text-dark" to="/login">
-              Login
+              <Trans i18nKey="description.part1">Login</Trans>
+            </Link>
+
+            <Link className="btn btn-outline text-dark" to="/register">
+              <Trans i18nKey="description.part1">Register</Trans>
             </Link>
           </div>
         </div>
@@ -100,7 +152,10 @@ function Navbar() {
                   </Link>
                   <ul className="dropdown">
                     <li>
-                      <Link to="/profile">Profile İnfo</Link>
+                      <Link to="/profile">
+                        {" "}
+                        <Trans i18nKey="description.part1">Profile Info</Trans>
+                      </Link>
                     </li>
                     <li>
                       <Link to="/orders">My Orders</Link>
@@ -122,6 +177,120 @@ function Navbar() {
       </div>
     );
   }
+
+  var languagelist = "";
+  if (loading) {
+    languagelist = language.map((item) => {
+      return (
+        <li>
+          <button
+            type="button"
+            onClick={() => {
+              globalContext.changeLanguage(item.name);
+              changeLanguage(item.name);
+              setShow({ show: true });
+            }}
+            className="btn btn-sm btn-succes"
+          >
+            <Link>{item.name}</Link>
+          </button>
+        </li>
+      );
+    });
+  }
+  var showCategoryList = "";
+
+  if (loading) {
+    showCategoryList = category.map((item) => {
+      var categoryImg = item.category_descriptions.find((x) => {
+        return x.language.name === globalContext.language;
+      }).description;
+      return (
+        <li className="nav-item dropdown">
+          <Link
+            className="nav-link dropdown-toggle text-dark"
+            to="#"
+            id={`${item.id}-navbardropdown`}
+            role="button"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {
+              item.category_descriptions.find((x) => {
+                return x.language.name === globalContext.language;
+              }).title
+            }
+          </Link>
+          {
+            <div
+              className="dropdown-menu"
+              aria-labelledby={`${item.id}-navbardropdown`}
+            >
+              <div className="container">
+                <div className="row">
+                  <div className="col-md-7">
+                    {item?.children_categories.map((sub_category) => {
+                      return (
+                        <>
+                          <span className="text-white">
+                            <Link
+                              className="nav-link"
+                              to={`/collections/${
+                                sub_category.category_descriptions.find((x) => {
+                                  return (
+                                    x.language.name === globalContext.language
+                                  );
+                                }).category_id
+                              }`}
+                            >
+                              {
+                                sub_category.category_descriptions.find((x) => {
+                                  return (
+                                    x.language.name === globalContext.language
+                                  );
+                                }).title
+                              }
+                            </Link>
+                          </span>
+                          <ul className="nav flex-column">
+                            {sub_category?.categories.map((sub_item) => {
+                              return (
+                                <li className="nav-item">
+                                  <Link
+                                    className="nav-link"
+                                    to={`/collections/${sub_item.category_id}`}
+                                  >
+                                    {sub_item.title}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </>
+                      );
+                    })}
+                  </div>
+                  <div className="col-md-5">{ReactHtmlParser(categoryImg)}</div>
+                </div>
+              </div>
+            </div>
+          }
+        </li>
+      );
+
+      // return (
+      //   <div className="float-start px-5" key={item.id}>
+      //     <Link
+      //       className="text-center text-decoration-none"
+      //       to={`collections/${item.name}`}
+      //     >
+      //       <h5>{item.name}</h5>
+      //     </Link>
+      //   </div>
+      // );
+    });
+  }
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-light bg-light p-0">
@@ -130,15 +299,97 @@ function Navbar() {
             className="collapse navbar-collapse d-flex justify-content-end "
             id="navbarSupportedContent"
           >
+            <div className="row mt-3">
+              <div className="col">
+                <nav className="header__menu mobile-menu">
+                  <ul>
+                    <li className="align-items-start">
+                      <Link className="text-decoration-none" to="#">
+                        Currency
+                      </Link>
+                      <ul className="dropdown">
+                        <li>
+                          <button
+                            onClick={() => toggleTheme("EUR")}
+                            type="button"
+                            className="btn btn-sm text-light px-3 mb-1"
+                          >
+                            € EU Euro
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => toggleTheme("USD")}
+                            type="button"
+                            className="btn btn-sm text-light px-3 mb-1"
+                          >
+                            $ US Dollar
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            onClick={() => toggleTheme("TRY")}
+                            type="button"
+                            className="btn btn-sm text-light px-3 mb-1"
+                          >
+                            ₺ TR TRY
+                          </button>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              <div className="col"></div>
+              <div className="col">
+                {" "}
+                <nav className="header__menu mobile-menu">
+                  <ul>
+                    <li>
+                      <Link className="text-decoration-none" to="#">
+                        Language
+                      </Link>
+                      <ul className="dropdown">{languagelist}</ul>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              <div className="col"></div>
+              <div className="col"></div>
+
+              {/* <button
+              type="button"
+              onClick={() => {
+                globalContext.changeLanguage("tr");
+                changeLanguage("tr");
+                setShow({ show: true });
+              }}
+              className="btn btn-sm btn-primary px-4"
+            >
+              TR
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                globalContext.changeLanguage("eng");
+                changeLanguage("en");
+                setShow({ show: false });
+              }}
+              className="btn btn-sm btn-primary px-4"
+            >
+              ENG
+            </button> */}
+            </div>
+
             <ul className="navbar-nav">
               <li className="nav-item">
                 <Link className="nav-link" to="/contact">
-                  Contact
+                  <Trans i18nKey="top_navbar.contact">Contact</Trans>
                 </Link>
               </li>
               <li className="nav-item">
                 <Link className="nav-link" to="/about">
-                  About
+                  <Trans i18nKey="top_navbar.about">About</Trans>
                 </Link>
               </li>
             </ul>
@@ -176,7 +427,6 @@ function Navbar() {
               <div className="position-relative d-inline mr-3 col-md-3">
                 {AuthButton}
               </div>
-
               <div className="position-relative d-inline mr-3 col-md-3">
                 <Link className="btn btn-light" to="/wishlist">
                   <FaRegHeart />
@@ -229,7 +479,8 @@ function Navbar() {
                       id="navbarSupportedContent"
                     >
                       <ul className="navbar-nav mr-auto">
-                        <li className="nav-item dropdown">
+                        {showCategoryList}
+                        {/* <li className="nav-item dropdown">
                           <Link
                             className="nav-link dropdown-toggle text-dark"
                             to="#"
@@ -239,610 +490,117 @@ function Navbar() {
                             aria-haspopup="true"
                             aria-expanded="false"
                           >
-                            Men
+                            
+                            <Trans i18nKey="navbarItems.Computer&TabletItems.Laptop">
+                              {" "}
+                              Electronic
+                            </Trans>
                           </Link>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="navbarDropdown"
-                          >
-                            <div className="container">
-                              <div className="row">
-                                <div className="col-md-3">
-                                  <span className="text-white">Clothes</span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/T-Shirt"
-                                      >
-                                        T-Shirt
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Tablet"
-                                      >
-                                        Tablet
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Monitor"
-                                      >
-                                        Monitor
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                  <span className="text-white">Phone</span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Mobile"
-                                      >
-                                        Mobile Phone
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div className="col-md-3">
-                                  <span className="text-white">
-                                    TV & Image & Sound
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Television"
-                                      >
-                                        Television
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
+                          {
+                            <div
+                              className="dropdown-menu"
+                              aria-labelledby="navbarDropdown"
+                            >
+                              <div className="container">
+                                <div className="row">
+                                  <div className="col-md-3">
+                                    <span className="text-white">
+                                      <Trans i18nKey="navbarItems.Computer&Tablet">
+                                        {" "}
+                                        Computer & Tablet
+                                      </Trans>
+                                    </span>
+                                    <ul className="nav flex-column">
+                                      <li className="nav-item">
+                                        <Link
+                                          className="nav-link"
+                                          to="/collections/Laptop"
+                                        >
+                                          {" "}
+                                          <Trans i18nKey="navbarItems.Computer&TabletItems.Laptop">
+                                            {" "}
+                                            Laptop
+                                          </Trans>
+                                        </Link>
+                                      </li>
+                                    </ul>
+                                    <ul className="nav flex-column">
+                                      <li className="nav-item">
+                                        <Link
+                                          className="nav-link"
+                                          to="/collections/Tablet"
+                                        >
+                                          Tablet
+                                        </Link>
+                                      </li>
+                                    </ul>
+                                    <ul className="nav flex-column">
+                                      <li className="nav-item">
+                                        <Link
+                                          className="nav-link"
+                                          to="/collections/Monitor"
+                                        >
+                                          Monitor
+                                        </Link>
+                                      </li>
+                                    </ul>
+                                    <span className="text-white">
+                                      <Trans i18nKey="navbarItems.Phone">
+                                        {" "}
+                                        Phone
+                                      </Trans>
+                                    </span>
+                                    <ul className="nav flex-column">
+                                      <li className="nav-item">
+                                        <Link
+                                          className="nav-link"
+                                          to="/collections/Mobile"
+                                        >
+                                          <Trans i18nKey="navbarItems.PhoneItems.MobilePhone">
+                                            {" "}
+                                            Mobile Phone
+                                          </Trans>
+                                        </Link>
+                                      </li>
+                                    </ul>
+                                  </div>
+                                  <div className="col-md-3">
+                                    <span className="text-white">
+                                      <Trans i18nKey="navbarItems.TV">
+                                        {" "}
+                                        TV & Image & Sound
+                                      </Trans>
+                                    </span>
+                                    <ul className="nav flex-column">
+                                      <li className="nav-item">
+                                        <Link
+                                          className="nav-link"
+                                          to="/collections/Television"
+                                        >
+                                          <Trans i18nKey="navbarItems.TvItems.Television">
+                                            {" "}
+                                            Television
+                                          </Trans>
+                                        </Link>
+                                      </li>
+                                    </ul>
+                                  </div>
 
-                                <div className="col-md-2">
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <Link to="/collections/Tablet">
-                                    <img src="https://e-commerce-template.surge.sh/images/banner/Tablets.webp" />
-                                    <br />
-                                    <br />
-                                  </Link>
-                                  <Link to="/collections/Television">
-                                    <img src="https://cdn.dsmcdn.com/ty284/pimWidgetApi/mobile_20211231072316_2160174ElektronikMobile202112301601.jpg" />
-                                  </Link>
+                                  <div className="col-md-4">
+                                    <Link to="/collections/Tablet">
+                                      <img src="https://e-commerce-template.surge.sh/images/banner/Tablets.webp" />
+                                      <br />
+                                      <br />
+                                    </Link>
+                                    <Link to="/collections/Television">
+                                      <img src="https://cdn.dsmcdn.com/ty284/pimWidgetApi/mobile_20211231072316_2160174ElektronikMobile202112301601.jpg" />
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </li>
-                        <li className="nav-item dropdown">
-                          <Link
-                            className="nav-link dropdown-toggle text-dark"
-                            to="#"
-                            id="navbarDropdown"
-                            role="button"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            Women
-                          </Link>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="navbarDropdown"
-                          >
-                            <div className="container">
-                              <div className="row">
-                                <div className="col-md-4">
-                                  <span className="text-uppercase text-white">
-                                    Category 2
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link active"
-                                        to="/collections/Shoes"
-                                      >
-                                        Shoe
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <Link to="">
-                                    <img
-                                      src="https://dummyimage.com/200x100/ccc/000&text=image+link"
-                                      alt=""
-                                      className="img-fluid"
-                                    />
-                                  </Link>
-                                  <p className="text-white">
-                                    Short image call to action
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="nav-item dropdown">
-                          <Link
-                            className="nav-link dropdown-toggle text-dark"
-                            to="#"
-                            id="navbarDropdown"
-                            role="button"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            Furniture
-                          </Link>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="navbarDropdown"
-                          >
-                            <div className="container">
-                              <div className="row">
-                                <div className="col-md-4">
-                                  <span className="text-uppercase text-white">
-                                    Category 3
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <Link to="">
-                                    <img
-                                      src="https://dummyimage.com/200x100/ccc/000&text=image+link"
-                                      alt=""
-                                      className="img-fluid"
-                                    />
-                                  </Link>
-                                  <p className="text-white">
-                                    Short image call to action
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="nav-item dropdown">
-                          <Link
-                            className="nav-link dropdown-toggle text-dark"
-                            to="#"
-                            id="navbarDropdown"
-                            role="button"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            Fashion
-                          </Link>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="navbarDropdown"
-                          >
-                            <div className="container">
-                              <div className="row">
-                                <div className="col-md-4">
-                                  <span className="text-uppercase text-white">
-                                    Category 3
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <Link to="">
-                                    <img
-                                      src="https://dummyimage.com/200x100/ccc/000&text=image+link"
-                                      alt=""
-                                      className="img-fluid"
-                                    />
-                                  </Link>
-                                  <p className="text-white">
-                                    Short image call to action
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="nav-item dropdown">
-                          <Link
-                            className="nav-link dropdown-toggle text-dark"
-                            to="#"
-                            id="navbarDropdown"
-                            role="button"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            Garden & Outdoors
-                          </Link>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="navbarDropdown"
-                          >
-                            <div className="container">
-                              <div className="row">
-                                <div className="col-md-4">
-                                  <span className="text-uppercase text-white">
-                                    Category 3
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <Link to="">
-                                    <img
-                                      src="https://dummyimage.com/200x100/ccc/000&text=image+link"
-                                      alt=""
-                                      className="img-fluid"
-                                    />
-                                  </Link>
-                                  <p className="text-white">
-                                    Short image call to action
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="nav-item dropdown">
-                          <Link
-                            className="nav-link dropdown-toggle text-dark"
-                            to="#"
-                            id="navbarDropdown"
-                            role="button"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            Jewellery
-                          </Link>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="navbarDropdown"
-                          >
-                            <div className="container">
-                              <div className="row">
-                                <div className="col-md-4">
-                                  <span className="text-uppercase text-white">
-                                    Category 3
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <Link to="">
-                                    <img
-                                      src="https://dummyimage.com/200x100/ccc/000&text=image+link"
-                                      alt=""
-                                      className="img-fluid"
-                                    />
-                                  </Link>
-                                  <p className="text-white">
-                                    Short image call to action
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                        <li className="nav-item dropdown">
-                          <Link
-                            className="nav-link dropdown-toggle text-dark"
-                            to="#"
-                            id="navbarDropdown"
-                            role="button"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            Electronic
-                          </Link>
-                          <div
-                            className="dropdown-menu"
-                            aria-labelledby="navbarDropdown"
-                          >
-                            <div className="container">
-                              <div className="row">
-                                <div className="col-md-3">
-                                  <span className="text-white">
-                                    Computer & Tablet
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Laptop"
-                                      >
-                                        Laptop
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Tablet"
-                                      >
-                                        Tablet
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Monitor"
-                                      >
-                                        Monitor
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                  <span className="text-white">Phone</span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Mobile"
-                                      >
-                                        Mobile Phone
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-                                <div className="col-md-3">
-                                  <span className="text-white">
-                                    TV & Image & Sound
-                                  </span>
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link
-                                        className="nav-link"
-                                        to="/collections/Television"
-                                      >
-                                        Television
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-2">
-                                  <ul className="nav flex-column">
-                                    <li className="nav-item">
-                                      <Link className="nav-link active" to="#">
-                                        Active
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                      <Link className="nav-link" to="#">
-                                        Link item
-                                      </Link>
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                <div className="col-md-4">
-                                  <Link to="/collections/Tablet">
-                                    <img src="https://e-commerce-template.surge.sh/images/banner/Tablets.webp" />
-                                    <br />
-                                    <br />
-                                  </Link>
-                                  <Link to="/collections/Television">
-                                    <img src="https://cdn.dsmcdn.com/ty284/pimWidgetApi/mobile_20211231072316_2160174ElektronikMobile202112301601.jpg" />
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
+                          }
+                        </li> */}
                       </ul>
                     </div>
                   </nav>
